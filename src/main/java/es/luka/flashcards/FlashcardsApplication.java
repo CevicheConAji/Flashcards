@@ -1,4 +1,4 @@
-package es.luka.flashcards.services;
+package es.luka.flashcards;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

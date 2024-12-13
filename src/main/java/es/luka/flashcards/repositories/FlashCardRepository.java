@@ -1,4 +1,7 @@
 package es.luka.flashcards.repositories;
 
-public class FlashCardRepository {
+import es.luka.flashcards.models.FlashCard;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface FlashCardRepository extends JpaRepository<FlashCard, Long> {
 }
