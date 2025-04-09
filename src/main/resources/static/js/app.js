@@ -1,62 +1,88 @@
-const API_BASE_URL = "http://localhost:8080/api"; // La base del backend
+const API_BASE_URL = "http://localhost:8080/api";
 
-// Selecciona los contenedores del DOM
-const categoryContainer = document.querySelector('.category-container');
-const flashcardContainer = document.querySelector('.flashcard-container');
-const categoriesSection = document.getElementById('categories');
-const flashcardsSection = document.getElementById('flashcards');
-
-// Mostrar las categorías dinámicamente
-fetch(`${API_BASE_URL}/categorias`)
-    .then(response => response.json())
-    .then(data => {
-        // Limpia el contenedor antes de renderizar
-        categoryContainer.innerHTML = '';
-
-        // Renderiza las categorías
-        data.forEach(categoria => {
-            const div = document.createElement('div');
-            div.className = 'category';
-            div.innerText = categoria.nombre; // Nombre de la categoría
-            div.onclick = () => showFlashCards(categoria.id); // Conecta la categoría con su función
-            categoryContainer.appendChild(div);
-        });
-    })
-    .catch(error => console.error('Error al obtener categorías:', error));
-
-
-// Mostrar las flashcards de una categoría
-function showFlashCards(categoriaId) {
-    flashcardContainer.innerHTML = ''; // Limpia las flashcards previas
-    fetch(`${API_BASE_URL}/flashcards/${categoriaId}`)
+document.addEventListener("DOMContentLoaded", () => {
+    fetch(`${API_BASE_URL}/categorias`)
         .then(response => response.json())
         .then(data => {
-            data.forEach(flashcard => {
-                const div = document.createElement('div');
-                div.className = 'flashcard';
-                div.innerText = flashcard.texto; // Texto de la flashcard
-                div.onclick = () => playAudio(flashcard.rutaAudio); // Conecta el audio con la función
-                flashcardContainer.appendChild(div);
+            const categoryContainer = document.getElementById("category-buttons");
+            data.forEach(category => {
+                const btn = document.createElement("button");
+                btn.className = "btn btn-outline-primary";
+                btn.textContent = category.nombre;
+                btn.onclick = () => showFlashCards(category.id);
+                categoryContainer.appendChild(btn);
             });
-            // Cambiar a la sección de flashcards
-            categoriesSection.style.display = 'none';
-            flashcardsSection.style.display = 'block';
+        });
+    btn.onclick = () => {
+        console.log("Clicked category ID:", category.id);
+        showFlashCards(category.id);
+    };
+});
+
+function showFlashCards(categoriaId) {
+    console.log("Loading flashcards for category ID:", categoriaId);
+
+    fetch(`${API_BASE_URL}/flashcards/${categoriaId}`)
+        .then(response => {
+            console.log("Flashcard response status:", response.status);
+            if (!response.ok) {
+                throw new Error("Error al cargar flashcards");
+            }
+            return response.json();
         })
-        .catch(error => console.error('Error al obtener flashcards:', error));
+        .then(data => {
+            console.log("Flashcard data received:", data);
+
+            const container = document.getElementById("flashcard-container");
+            container.innerHTML = "";
+
+            if (!Array.isArray(data) || data.length === 0) {
+                container.innerHTML = '<p class="text-muted">No hay flash cards para esta categoría.</p>';
+                return;
+            }
+
+            data.forEach(card => {
+                const col = document.createElement("div");
+                col.className = "col-md-4 mb-3";
+
+                const cardDiv = document.createElement("div");
+                cardDiv.className = "card text-center shadow-sm";
+
+                const body = document.createElement("div");
+                body.className = "card-body";
+
+                const title = document.createElement("h5");
+                title.className = "card-title";
+                title.textContent = card.texto;
+
+                const playButton = document.createElement("button");
+                playButton.className = "btn btn-primary mt-2";
+                playButton.innerHTML = `<i class="bi bi-volume-up"></i> Escuchar`;
+                playButton.onclick = () => playAudio(card.rutaAudio);
+
+                body.appendChild(title);
+                body.appendChild(playButton);
+                cardDiv.appendChild(body);
+                col.appendChild(cardDiv);
+                container.appendChild(col);
+            });
+
+            document.getElementById("categories").style.display = "none";
+            document.getElementById("flashcards").style.display = "block";
+        })
+        .catch(error => {
+            console.error("Error cargando flashcards:", error);
+            alert("Ocurrió un error al cargar las flash cards.");
+        });
 }
 
-// Reproducir audio
+
+function showCategories() {
+    document.getElementById("flashcards").style.display = "none";
+    document.getElementById("categories").style.display = "block";
+}
+
 function playAudio(audioFile) {
     const audio = new Audio(`/audios/${audioFile}`);
     audio.play();
 }
-
-// Volver a las categorías
-function showCategories() {
-    flashcardsSection.style.display = 'none';
-    categoriesSection.style.display = 'block';
-}
-
-
-
-

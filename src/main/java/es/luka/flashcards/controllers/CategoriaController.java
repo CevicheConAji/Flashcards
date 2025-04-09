@@ -19,8 +19,8 @@ public class CategoriaController {
     private final CategoriaRepository categoriaRepository;
     private final FlashCardRepository flashCardRepository;
 
-    @Value("${audio.storage.path}")
-    private String audioStoragePath;
+    /**@Value("${audio.storage.path}")
+    private String audioStoragePath;**/
 
     public CategoriaController(CategoriaRepository categoriaRepository, FlashCardRepository flashCardRepository) {
         this.categoriaRepository = categoriaRepository;
@@ -45,14 +45,14 @@ public class CategoriaController {
 
 
     // Obtener un archivo de audio por nombre
-    @GetMapping("/audio/{fileName}")
+    /**@GetMapping("/audio/{fileName}")
     public ResponseEntity<File> getAudioFile(@PathVariable String fileName) {
         File file = new File(audioStoragePath + fileName);
         if (!file.exists()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(file);
-    }
+    }**/
 
     // Verificar si una categoría existe por nombre
     @GetMapping("/categorias/exists/{nombre}")

@@ -2,34 +2,29 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebApp de Flash Cards</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="css/style.css">
-
+    <link rel="icon" href="/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body>
-<header>
-    <h1>WebApp de Flash Cards</h1>
-</header>
+<body class="bg-light">
 
-<section id="categories">
-    <h2>Categorías</h2>
-    <div class="category-container">
-        <!-- Categorías dinámicas -->
-    </div>
-</section>
+<div class="container py-4">
+    <h1 class="text-center mb-4">WebApp de Flash Cards</h1>
 
-<section id="flashcards" style="display: none;">
-    <h2>Flash Cards</h2>
-    <div class="flashcard-container">
-        <!-- Flash Cards dinámicas -->
+    <div id="categories" class="mb-4">
+        <h3>Categorías</h3>
+        <div class="d-flex flex-wrap gap-2" id="category-buttons"></div>
     </div>
-    <button onclick="showCategories()">Volver a Categorías</button>
-</section>
+
+    <div id="flashcards" style="display: none;">
+        <h3>Flash Cards</h3>
+        <div class="row" id="flashcard-container"></div>
+        <button class="btn btn-secondary mt-3" onclick="showCategories()">Volver a Categorías</button>
+    </div>
+</div>
 
 <script src="js/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
