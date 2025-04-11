@@ -9,14 +9,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 const btn = document.createElement("button");
                 btn.className = "btn btn-outline-primary";
                 btn.textContent = category.nombre;
-                btn.onclick = () => showFlashCards(category.id);
+                btn.onclick = () => {
+                    window.history.pushState({}, "", `/categoria/${category.id}`);
+                    showFlashCards(category.id);
+                };
                 categoryContainer.appendChild(btn);
             });
         });
-    btn.onclick = () => {
-        console.log("Clicked category ID:", category.id);
-        showFlashCards(category.id);
-    };
 });
 
 function showFlashCards(categoriaId) {
@@ -32,6 +31,8 @@ function showFlashCards(categoriaId) {
         })
         .then(data => {
             console.log("Flashcard data received:", data);
+
+            data.sort((a, b) => a.texto.localeCompare(b.texto));
 
             const container = document.getElementById("flashcard-container");
             container.innerHTML = "";
@@ -86,3 +87,4 @@ function playAudio(audioFile) {
     const audio = new Audio(`/audios/${audioFile}`);
     audio.play();
 }
+
