@@ -33,6 +33,8 @@ function showFlashCards(categoriaId) {
         .then(data => {
             console.log("Flashcard data received:", data);
 
+            data.sort((a, b) => a.texto.localeCompare(b.texto));
+
             const container = document.getElementById("flashcard-container");
             container.innerHTML = "";
 

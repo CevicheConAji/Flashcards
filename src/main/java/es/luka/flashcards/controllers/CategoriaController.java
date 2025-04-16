@@ -4,12 +4,10 @@ import es.luka.flashcards.models.Categoria;
 import es.luka.flashcards.models.FlashCard;
 import es.luka.flashcards.repositories.CategoriaRepository;
 import es.luka.flashcards.repositories.FlashCardRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
 import java.util.List;
 
 @RestController
