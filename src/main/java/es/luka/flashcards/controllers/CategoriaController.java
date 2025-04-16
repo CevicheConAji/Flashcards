@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controlador REST para gestionar las categorías y flashcards.
+ */
 @RestController
 @RequestMapping("/api")
 public class CategoriaController {
@@ -17,42 +20,46 @@ public class CategoriaController {
     private final CategoriaRepository categoriaRepository;
     private final FlashCardRepository flashCardRepository;
 
-    /**@Value("${audio.storage.path}")
-    private String audioStoragePath;**/
-
+    /**
+     * Constructor para inyectar los repositorios necesarios.
+     *
+     * @param categoriaRepository Repositorio de categorías.
+     * @param flashCardRepository Repositorio de flashcards.
+     */
     public CategoriaController(CategoriaRepository categoriaRepository, FlashCardRepository flashCardRepository) {
         this.categoriaRepository = categoriaRepository;
         this.flashCardRepository = flashCardRepository;
     }
 
-    // Obtener todas las categorías
+    /**
+     * Obtiene todas las categorías disponibles.
+     *
+     * @return Lista de todas las categorías.
+     */
     @GetMapping("/categorias")
     public List<Categoria> getAllCategorias() {
         return categoriaRepository.findAll();
     }
 
-    // Obtener flashcards por categoría
+    /**
+     * Obtiene las flashcards asociadas a una categoría específica.
+     *
+     * @param categoriaId ID de la categoría.
+     * @return Lista de flashcards de la categoría o un estado 404 si no se encuentra.
+     */
     @GetMapping("/flashcards/{categoriaId}")
     public ResponseEntity<List<FlashCard>> getFlashCardsByCategoria(@PathVariable Long categoriaId) {
-        Categoria categoria = categoriaRepository.findById(categoriaId).orElse(null);
-        if (categoria == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(categoria.getFlashCards());
+        return categoriaRepository.findById(categoriaId)
+                .map(categoria -> ResponseEntity.ok(categoria.getFlashCards()))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-
-    // Obtener un archivo de audio por nombre
-    /**@GetMapping("/audio/{fileName}")
-    public ResponseEntity<File> getAudioFile(@PathVariable String fileName) {
-        File file = new File(audioStoragePath + fileName);
-        if (!file.exists()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(file);
-    }**/
-
-    // Verificar si una categoría existe por nombre
+    /**
+     * Verifica si una categoría existe por su nombre.
+     *
+     * @param nombre Nombre de la categoría.
+     * @return `true` si la categoría existe, `false` en caso contrario.
+     */
     @GetMapping("/categorias/exists/{nombre}")
     public ResponseEntity<Boolean> categoriaExiste(@PathVariable String nombre) {
         boolean exists = categoriaRepository.existsByNombre(nombre);
