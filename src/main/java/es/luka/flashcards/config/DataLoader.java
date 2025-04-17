@@ -22,6 +22,14 @@ public class DataLoader implements CommandLineRunner {
     private static final String CATEGORIA_SENTIMIENTOS = "Sentimientos";
     private static final String CATEGORIA_MIS_DATOS = "Mis Datos";
     private static final String CATEGORIA_ANIMALES = "Animales";
+    private static final String CATEGORIA_COMIDA = "Comida";
+    private static final String CATEGORIA_EMERGENCIA_NECESIDADES = "Emergencia y Necesidades";
+    private static final String CATEGORIA_LUGARES = "Lugares";
+    private static final String CATEGORIA_OBJETOS = "Objetos";
+    private static final String CATEGORIA_PARTES_CUERPO = "Partes del Cuerpo";
+    private static final String CATEGORIA_PERSONAS_FAMILIA_AMISTADES = "Personas, Familia y Amistades";
+    private static final String CATEGORIA_VESTIMENTA = "Vestimenta";
+
 
     private final CategoriaRepository categoriaRepository;
 
@@ -35,7 +43,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     /**
-     * Método que se ejecuta al iniciar la aplicación. Carga las categorías y sus flashcards
+     * Metodo que se ejecuta al iniciar la aplicación. Carga las categorías y sus flashcards
      * en la base de datos si no existen previamente.
      *
      * @param args Argumentos de línea de comandos.
@@ -49,6 +57,13 @@ public class DataLoader implements CommandLineRunner {
         cargarCategoriaSiNoExiste(CATEGORIA_MIS_DATOS, this::crearCategoriaMisDatos);
         cargarCategoriaSiNoExiste(CATEGORIA_SENTIMIENTOS, this::crearCategoriaSentimientos);
         cargarCategoriaSiNoExiste(CATEGORIA_ANIMALES, this::crearCategoriaAnimales);
+        cargarCategoriaSiNoExiste(CATEGORIA_COMIDA,this::crearCategoriaComida);
+        cargarCategoriaSiNoExiste(CATEGORIA_EMERGENCIA_NECESIDADES, this::crearCategoriaEmergenciaNecesidades);
+        cargarCategoriaSiNoExiste(CATEGORIA_LUGARES, this::crearCategoriaLugares);
+        cargarCategoriaSiNoExiste(CATEGORIA_OBJETOS, this::crearCategoriaObjetos);
+        cargarCategoriaSiNoExiste(CATEGORIA_PARTES_CUERPO, this::crearCategoriaPartesCuerpo);
+        cargarCategoriaSiNoExiste(CATEGORIA_PERSONAS_FAMILIA_AMISTADES, this::crearCategoriaPersonasFamiliaAmistades);
+        cargarCategoriaSiNoExiste(CATEGORIA_VESTIMENTA, this::crearCategoriaVestimenta);
     }
 
     /**
@@ -65,12 +80,104 @@ public class DataLoader implements CommandLineRunner {
     }
 
     /**
+     * Crea la categoría "Vestimenta" con sus flashcards.
+     *
+     * @return Categoría "Vestimenta".
+     */
+    private Categoria crearCategoriaVestimenta() {
+        List<String> nombresVestimenta = Arrays.asList(
+                "Abrigo", "Americana", "Anteojos", "Blusa", "Botas", "Bufanda", "Camisa", "Cinturón", "Falda", "Gayumbos",
+                "Gorra", "Gorro", "Medias", "Pantalón", "Pantalones cortos", "Reloj", "Ropa de deportiva", "Sujetador",
+                "Sudadera", "Tanga", "Traje de baño", "Vaqueros", "Vestido", "Zapatillas", "Zapatos de hombre", "Zapatos de mujer"
+        );
+        return crearCategoriaConFlashCards(CATEGORIA_VESTIMENTA, nombresVestimenta);
+    }
+
+    /**
+     * Crea la categoría "Partes del Cuerpo" con sus flashcards.
+     *
+     * @return Categoría "Partes del Cuerpo".
+     */
+    private Categoria crearCategoriaPartesCuerpo() {
+        List<String> nombresPartesCuerpo = Arrays.asList(
+                "Boca", "Brazo", "Cabeza", "Cejas", "Codo", "Corazón", "Cuello", "Dedo", "Dedos", "Dientes", "Espalda",
+                "Estómago", "Garganta", "Hígado", "Hombro", "Mano", "Nariz", "Ojos", "Pestañas", "Pie", "Pierna",
+                "Rodilla", "Tobillo", "Pelo"
+        );
+        return crearCategoriaConFlashCards(CATEGORIA_PARTES_CUERPO, nombresPartesCuerpo);
+    }
+
+    /**
+     * Crea la categoría "Personas, Familia y Amistades" con sus flashcards.
+     *
+     * @return Categoría "Personas, Familia y Amistades".
+     */
+    private Categoria crearCategoriaPersonasFamiliaAmistades() {
+        List<String> nombresPersonas = Arrays.asList(
+                "Abuela", "Abuelo", "Abuelos", "Bombero", "Dentista", "Doctora", "Doctor", "El", "Ella", "Ellas", "Ellos",
+                "Hermana", "Hermano", "Hija", "Hijo", "Maestra", "Mamá", "Nosotros", "Papá", "Policía", "Vosotros", "Yo"
+        );
+        return crearCategoriaConFlashCards(CATEGORIA_PERSONAS_FAMILIA_AMISTADES, nombresPersonas);
+    }
+
+    /**
+     * Crea la categoría "Lugares" con sus flashcards.
+     *
+     * @return Categoría "Lugares".
+     */
+    private Categoria crearCategoriaLugares() {
+        List<String> nombresLugares = Arrays.asList(
+                "Baile", "Baño", "Calle", "Casa", "Cine", "Cocina", "Comisaría", "Dormitorio", "Escuela", "Escalera",
+                "Estadio", "Hospital", "Lavadero", "Panadería", "Patio de Escuela", "Plaza", "Pollería", "Quiosco",
+                "Restaurante", "Salón", "Supermercado", "Tienda de Ropa hombre", "Tienda de Ropa mujer", "Universidad",
+                "Verdulería", "Zapatería"
+        );
+        return crearCategoriaConFlashCards(CATEGORIA_LUGARES, nombresLugares);
+    }
+
+    /**
+     * Crea la categoría "Emergencia y Necesidades" con sus flashcards.
+     *
+     * @return Categoría "Emergencia y Necesidades".
+     */
+    private Categoria crearCategoriaEmergenciaNecesidades(){
+        List<String> nombresEmergencia = Arrays.asList(
+                "Ambulancia", "Ayuda", "Bombero", "Borracho", "Choque", "Ciego", "Discapacidad", "Doctor", "Dolor",
+                "Dolor de brazo", "Dolor de cabeza", "Dolor de estómago", "Dolor de espalda", "Dolor de garganta",
+                "Dolor de muela", "Dolor de oído", "Enfermera", "Escalera", "Fiebre", "Incendio", "Inyección",
+                "Lastimadura", "Pelea", "Policía", "Resfrío", "Robo", "Salida de emergencia", "Sordo"
+        );
+        return crearCategoriaConFlashCards(CATEGORIA_EMERGENCIA_NECESIDADES, nombresEmergencia);
+    }
+    /**
+     * Crea la categoría "Objetos" con sus flashcards.
+     *
+     * @return Categoría "Objetos".
+     */
+    private Categoria crearCategoriaComida() {
+        List<String> nombresComida = Arrays.asList(
+                "Agua", "Arroz", "Azúcar", "Banana", "Bebida", "Café", "Caramelo", "Carne", "Cebolla", "Cerveza",
+                "Chocolate", "Chuches", "Ensalada", "Fideos", "Fruta", "Hamburguesa", "Helado", "Huevos", "Jamón",
+                "Lechuga", "Manzana", "Mayonesa", "Melocotón", "Mostaza", "Pan", "Papas Fritas", "Patata",
+                "Perrito Caliente", "Pescado", "Pizza", "Pollo", "Queso", "Sacarina", "Salchicha", "Sandía",
+                "Sándwich", "Té", "Tomate", "Torta", "Vino", "Zumo", "Zanahoria"
+        );
+        return crearCategoriaConFlashCards(CATEGORIA_COMIDA, nombresComida);
+    }
+
+    /**
      * Crea la categoría "Animales" con sus flashcards.
      *
      * @return Categoría "Animales".
      */
     private Categoria crearCategoriaAnimales() {
-        List<String> nombresAnimales = Arrays.asList("Perro", "Gato", "Elefante", "León");
+        List<String> nombresAnimales = Arrays.asList(
+                "Abeja", "Águila", "Araña", "Ballena", "Búfalo", "Burro", "Caballo", "Camello", "Caracol", "Canguro",
+                "Cebra", "Cerdo", "Ciervo", "Cisne", "Cocodrilo", "Cucaracha", "Dinosaurio", "Elefante", "Escarabajo",
+                "Foca", "Gallina", "Gallo", "Gato", "Hipopótamo", "Hormiga", "Jirafa", "León", "Lobo", "Loro",
+                "Mariposa", "Mono", "Mosca", "Mosquito", "Oso", "Oveja", "Pájaro", "Pato", "Perro", "Pingüino",
+                "Pollito", "Ratón", "Tigre", "Toro", "Tortuga", "Vaca", "Zorro"
+        );
         return crearCategoriaConFlashCards(CATEGORIA_ANIMALES, nombresAnimales);
     }
 
@@ -80,8 +187,27 @@ public class DataLoader implements CommandLineRunner {
      * @return Categoría "Acciones".
      */
     private Categoria crearCategoriaAcciones() {
-        List<String> nombresAcciones = Arrays.asList("Abrir", "Acostar" , "Agarrar" , "Almorzar" , "Aprender" , "Atar");
+        List<String> nombresAcciones = Arrays.asList("Abrir", "Acostar" , "Agarrar" , "Almorzar" , "Aprender" , "Atar"
+                , "Bailar" , "Bajar" ,"Beber" , "Buscar" , "Caminar" , "Cantar" , "Cenar" , "Cerrar" ,"Comer" , "Cortar"
+                , "Correr" , "Desayunar" , "Despertar" , "Dibujar" , "Dormir" , "Empujar" , "Enseñar" , "Escuchar"
+                ,"Escribir" , "Estudiar" , "Guardar" , "Gritar" , "Hablar" , "Jugar" , "Leer" , "Llamar" , "Llorar"
+                , "Merendar" , "Mirar" , "Morder" , "Oler", "Pensar" , "Salir", "Servir" , "Sonreir" , "Subir" , "Tocar"
+                , "Vestirse"
+        );
         return crearCategoriaConFlashCards(CATEGORIA_ACCIONES, nombresAcciones);
+    }
+
+    /**
+     * Crea la categoría "Objetos" con sus flashcards.
+     *
+     * @return Categoría "Objetos".
+     */
+    private Categoria crearCategoriaObjetos() {
+        List<String> nombresObjetos = Arrays.asList(
+                "Aire Acondicionado", "Bolígrafos", "Computadora", "Cuaderno", "Escritorio", "Lámpara", "Libro", "Lápiz",
+                "Mesa", "Pelota", "Robot", "Silla", "Tablet", "Teléfono", "Televisión", "Ventilador"
+        );
+        return crearCategoriaConFlashCards(CATEGORIA_OBJETOS, nombresObjetos);
     }
 
     /**
@@ -92,7 +218,7 @@ public class DataLoader implements CommandLineRunner {
     private Categoria crearCategoriaSentimientos() {
         List<String> nombresSentimientos = Arrays.asList(
                 "Aburrido", "Amor", "Asustado", "Calor", "Cansado", "Contento", "Divertido", "Dolor",
-                "Enamorado", "Enojado", "Feliz", "Frio", "Hambre", "Pensando", "Sed", "Triste", "Verguenza"
+                "Enamorado", "Enojado", "Feliz", "Frio", "Hambre", "Pensando", "Sed", "Triste", "Vergüenza"
         );
         return crearCategoriaConFlashCards(CATEGORIA_SENTIMIENTOS, nombresSentimientos);
     }
