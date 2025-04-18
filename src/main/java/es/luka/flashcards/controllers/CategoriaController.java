@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador REST para gestionar las categorías y flashcards.
@@ -48,10 +50,15 @@ public class CategoriaController {
      * @return Lista de flashcards de la categoría o un estado 404 si no se encuentra.
      */
     @GetMapping("/flashcards/{categoriaId}")
-    public ResponseEntity<List<FlashCard>> getFlashCardsByCategoria(@PathVariable Long categoriaId) {
+    public ResponseEntity<?> getFlashCardsByCategoria(@PathVariable Long categoriaId) {
         return categoriaRepository.findById(categoriaId)
-                .map(categoria -> ResponseEntity.ok(categoria.getFlashCards()))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+                .map(categoria -> {
+                    // Crear un mapa con el nombre de la categoría y las flashcards
+                    Map<String, Object> respuesta = new HashMap<>();
+                    respuesta.put("categoriaNombre", categoria.getNombre());
+                    respuesta.put("flashcards", categoria.getFlashCards());
+                    return ResponseEntity.ok(respuesta);
+                }).orElse(ResponseEntity.notFound().build());
     }
 
     /**

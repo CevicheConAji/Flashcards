@@ -46,7 +46,12 @@ function showFlashCards(categoriaId) {
             }
             return response.json();
         })
-        .then(data => renderizarFlashCards(data))
+        .then(data => {
+            // Actualiza el nombre de la categoría
+            document.getElementById("category-name").textContent = data.categoriaNombre || "Categoría desconocida";
+            // Renderiza las flashcards desde el campo "flashcards"
+            renderizarFlashCards(data.flashcards);
+        })
         .catch(error => {
             console.error("Error cargando flashcards:", error);
             alert("Ocurrió un error al cargar las flash cards.");

@@ -1,31 +1,81 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Metadatos básicos del documento -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebApp de Flash Cards</title>
+
+    <!-- Favicon del sitio -->
     <link rel="icon" href="/favicon.ico">
+
+    <!-- Estilos de Bootstrap para diseño responsivo y componentes -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Iconos de Bootstrap para botones y otros elementos -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Estilos personalizados -->
+    <style>
+        body {
+            background-color: #f8f9fa; /* Color de fondo claro */
+        }
+        .section-title {
+            border-bottom: 2px solid #0d6efd; /* Línea azul debajo del título */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .category-button {
+            min-width: 150px; /* Ancho mínimo para los botones de categoría */
+        }
+        .flashcard {
+            transition: transform 0.2s; /* Animación de escala al pasar el ratón */
+        }
+        .flashcard:hover {
+            transform: scale(1.05); /* Aumenta ligeramente el tamaño al pasar el ratón */
+        }
+    </style>
 </head>
-<body class="bg-light fs-5">
+<body>
+<div class="container py-5">
+    <!-- Título principal de la aplicación -->
+    <h1 class="text-center mb-5 text-primary">WebApp de Flash Cards</h1>
 
-<div class="container py-4">
-    <h1 class="text-center mb-4">WebApp de Flash Cards</h1>
-
-    <div id="categories" class="mb-4">
+    <!-- Sección de categorías -->
+    <div id="categories" class="mb-5">
         <h3>Categorías</h3>
-        <div class="d-flex flex-wrap gap-2" id="category-buttons"></div>
+        <!-- Contenedor para los botones de categorías -->
+        <div class="d-flex flex-wrap gap-3 justify-content-center" id="category-buttons"></div>
     </div>
 
+    <!-- Sección de flashcards (oculta inicialmente) -->
     <div id="flashcards" style="display: none;">
-        <h3>Flash Cards</h3>
-        <div class="row" id="flashcard-container"></div>
-        <button class="btn btn-secondary mt-3" onclick="showCategories()">Volver a Categorías</button>
+        <!-- Nombre de la categoría seleccionada -->
+        <h3 id="category-name" class="text-muted text-center mb-4"></h3>
+
+        <!-- Botón para volver a la vista de categorías -->
+        <div class="text-center mb-4">
+            <button class="btn btn-secondary" onclick="showCategories()">
+                <i class="bi bi-arrow-left"></i> Volver a Categorías
+            </button>
+        </div>
+
+        <!-- Contenedor para las flashcards -->
+        <div class="row g-4" id="flashcard-container"></div>
+
+        <!-- Botón adicional para volver a la vista de categorías -->
+        <div class="text-center mt-4">
+            <button class="btn btn-secondary" onclick="showCategories()">
+                <i class="bi bi-arrow-left"></i> Volver a Categorías
+            </button>
+        </div>
     </div>
 </div>
 
+<!-- Archivo JavaScript principal de la aplicación -->
 <script src="js/app.js"></script>
+
+<!-- Scripts de Bootstrap para funcionalidad adicional -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
