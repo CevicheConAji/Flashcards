@@ -1,69 +1,88 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Metadatos básicos del documento -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebApp de Flash Cards</title>
-
-    <!-- Favicon del sitio -->
     <link rel="icon" href="/favicon.ico">
-
-    <!-- Estilos de Bootstrap para diseño responsivo y componentes -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Iconos de Bootstrap para botones y otros elementos -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Estilos personalizados -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa; /* Color de fondo claro */
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .navbar {
+            background-color: #1a73e8;
+        }
+        .navbar-brand, .navbar-nav .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+        }
+        .navbar-brand:hover, .navbar-nav .nav-link:hover {
+            color: #dce4f7 !important;
         }
         .section-title {
-            border-bottom: 2px solid #0d6efd; /* Línea azul debajo del título */
+            border-bottom: 3px solid #1a73e8;
             padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            color: #1a73e8;
         }
         .category-button {
-            min-width: 150px; /* Ancho mínimo para los botones de categoría */
+            min-width: 150px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .category-button:hover {
+            background-color: #1a73e8;
+            color: #fff;
         }
         .flashcard {
-            transition: transform 0.2s; /* Animación de escala al pasar el ratón */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 8px;
+            overflow: hidden;
         }
         .flashcard:hover {
-            transform: scale(1.05); /* Aumenta ligeramente el tamaño al pasar el ratón */
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        footer {
+            background-color: #1a73e8;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        footer a {
+            color: #dce4f7;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 <div class="container py-5">
-    <!-- Título principal de la aplicación -->
     <h1 class="text-center mb-5 text-primary">WebApp de Flash Cards</h1>
 
-    <!-- Sección de categorías -->
     <div id="categories" class="mb-5">
-        <h3>Categorías</h3>
-        <!-- Contenedor para los botones de categorías -->
+        <h3 class="section-title">Categorías</h3>
         <div class="d-flex flex-wrap gap-3 justify-content-center" id="category-buttons"></div>
     </div>
 
-    <!-- Sección de flashcards (oculta inicialmente) -->
     <div id="flashcards" style="display: none;">
-        <!-- Nombre de la categoría seleccionada -->
         <h3 id="category-name" class="text-muted text-center mb-4"></h3>
-
-        <!-- Botón para volver a la vista de categorías -->
         <div class="text-center mb-4">
             <button class="btn btn-secondary" onclick="showCategories()">
                 <i class="bi bi-arrow-left"></i> Volver a Categorías
             </button>
         </div>
-
-        <!-- Contenedor para las flashcards -->
         <div class="row g-4" id="flashcard-container"></div>
-
-        <!-- Botón adicional para volver a la vista de categorías -->
         <div class="text-center mt-4">
             <button class="btn btn-secondary" onclick="showCategories()">
                 <i class="bi bi-arrow-left"></i> Volver a Categorías
@@ -72,10 +91,51 @@
     </div>
 </div>
 
-<!-- Archivo JavaScript principal de la aplicación -->
-<script src="js/app.js"></script>
+<!-- Pie de página -->
+<footer>
+    <div class="container py-4">
+        <div class="row text-center text-md-start">
 
-<!-- Scripts de Bootstrap para funcionalidad adicional -->
+            <!-- Enlaces a redes sociales -->
+            <div class="col-md-3 mb-3">
+                <h5>Síguenos</h5>
+                <div>
+                    <a href="https://facebook.com" target="_blank" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="https://twitter.com" target="_blank" class="text-white me-2"><i class="bi bi-twitter"></i></a>
+                    <a href="https://instagram.com" target="_blank" class="text-white"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+
+            <!-- Avisos legales -->
+            <div class="col-md-3 mb-3">
+                <h5>Legal</h5>
+                <ul class="list-unstyled">
+                    <li><a href="/aviso-legal.html" class="text-white">Aviso Legal</a></li>
+                    <li><a href="/politica-privacidad.html" class="text-white">Política de Privacidad</a></li>
+                    <li><a href="/politica-cookies.html" class="text-white">Política de Cookies</a></li>
+                </ul>
+            </div>
+
+            <!-- Datos de contacto -->
+            <div class="col-md-3 mb-3">
+                <h5>Contacto</h5>
+                <p>Email: zavalachirapiero@gmail.com</p>
+                <p>Teléfono: +34 747 421 185</p>
+                <p>Dirección: Calle Musico Andreu 14, Valencia, España</p>
+            </div>
+
+            <!-- Marca registrada -->
+            <div class="col-md-3 mb-3">
+                <h5>Marca Registrada</h5>
+                <p>&copy; 2025 Flash Cards. Todos los derechos reservados.</p>
+            </div>
+
+        </div>
+    </div>
+
+
+</footer>
+<script src="js/app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
