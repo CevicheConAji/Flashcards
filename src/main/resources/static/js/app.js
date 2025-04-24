@@ -26,6 +26,10 @@ function renderizarCategorias(categorias) {
         const btn = document.createElement("button");
         btn.className = "btn btn-outline-primary";
         btn.textContent = categoria.nombre;
+        // Agregar atributos de accesibilidad
+        btn.setAttribute("aria-label", `Seleccionar categoría ${categoria.nombre}`);
+        btn.setAttribute("role", "listitem");
+
         btn.onclick = () => {
             console.log("Clicked category ID:", categoria.id);
             showFlashCards(categoria.id);

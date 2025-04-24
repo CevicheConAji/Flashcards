@@ -32,14 +32,19 @@
             color: #1a73e8;
         }
         .category-button {
-            min-width: 150px;
-            font-weight: 500;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            font-size: 1.2rem; /* Aumenta el tamaño del texto */
+            padding: 1rem 1.5rem; /* Aumenta el área de clic */
+            border-radius: 8px; /* Bordes redondeados */
+            outline: none; /* Elimina el borde predeterminado */
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        .category-button:focus {
+            outline: 3px solid #1a73e8; /* Enfoque visible */
+            outline-offset: 2px;
         }
         .category-button:hover {
-            background-color: #1a73e8;
-            color: #fff;
+            transform: scale(1.05); /* Efecto de zoom */
+            background-color: #dce4f7; /* Cambio de color */
         }
         .flashcard {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -72,7 +77,9 @@
 
     <div id="categories" class="mb-5">
         <h3 class="section-title">Categorías</h3>
-        <div class="d-flex flex-wrap gap-3 justify-content-center" id="category-buttons"></div>
+        <div class="d-flex flex-wrap gap-3 justify-content-center" id="category-buttons" role="list">
+            <!-- Los botones se generarán dinámicamente -->
+        </div>
     </div>
 
     <div id="flashcards" style="display: none;">
