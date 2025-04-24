@@ -13,6 +13,8 @@ public class FlashCard {
 
     private String rutaAudio;
 
+    private String rutaImagen;
+
     @ManyToOne
     @JoinColumn(name = "categoria_id") // Clave foránea hacia Categoria
     @JsonBackReference // Evita serialización cíclica en JSON
@@ -50,5 +52,13 @@ public class FlashCard {
 
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
+    }
+
+    public String getRutaImagen() {
+        return rutaImagen;
+    }
+
+    public void setRutaImagen(String rutaImagen) {
+        this.rutaImagen = rutaImagen;
     }
 }

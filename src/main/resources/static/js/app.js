@@ -24,7 +24,7 @@ function renderizarCategorias(categorias) {
 
     categorias.forEach(categoria => {
         const btn = document.createElement("button");
-        btn.className = "btn btn-outline-primary";
+        btn.className = "btn btn-outline-primary category-button"; // Agrega la clase 'category-button'
         btn.textContent = categoria.nombre;
         // Agregar atributos de accesibilidad
         btn.setAttribute("aria-label", `Seleccionar categoría ${categoria.nombre}`);
@@ -80,7 +80,13 @@ function renderizarFlashCards(flashcards) {
         col.className = "col-md-4 mb-3";
 
         const cardDiv = document.createElement("div");
-        cardDiv.className = "card text-center shadow-sm";
+        cardDiv.className = "card text-center shadow-sm flashcard";
+        cardDiv.onclick = () => playAudio(card.rutaAudio); // Reproduce el audio al hacer clic en la tarjeta
+
+        const img = document.createElement("img");
+        img.src = `/images/${card.rutaImagen}`; // Ruta de la imagen
+        img.className = "card-img-top img-fluid"; // Clase de Bootstrap para imágenes en tarjetas
+        img.alt = card.texto; // Texto alternativo
 
         const body = document.createElement("div");
         body.className = "card-body";
@@ -89,13 +95,8 @@ function renderizarFlashCards(flashcards) {
         title.className = "card-title";
         title.textContent = card.texto;
 
-        const playButton = document.createElement("button");
-        playButton.className = "btn btn-primary mt-2";
-        playButton.innerHTML = `<i class="bi bi-volume-up"></i> Escuchar`;
-        playButton.onclick = () => playAudio(card.rutaAudio);
-
         body.appendChild(title);
-        body.appendChild(playButton);
+        cardDiv.appendChild(img); // Agrega la imagen al cardDiv
         cardDiv.appendChild(body);
         col.appendChild(cardDiv);
         container.appendChild(col);

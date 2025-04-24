@@ -86,9 +86,9 @@ public class DataLoader implements CommandLineRunner {
      */
     private Categoria crearCategoriaVestimenta() {
         List<String> nombresVestimenta = Arrays.asList(
-                "Abrigo", "Americana", "Anteojos", "Blusa", "Botas", "Bufanda", "Camisa", "Cinturón", "Falda", "Gayumbos",
-                "Gorra", "Gorro", "Medias", "Pantalón", "Pantalones cortos", "Reloj", "Ropa de deportiva", "Sujetador",
-                "Sudadera", "Tanga", "Traje de baño", "Vaqueros", "Vestido", "Zapatillas", "Zapatos de hombre", "Zapatos de mujer"
+                "Americana", "Gafas", "Blusa", "Botas", "Bragas", "Bufanda", "Camisa","Chaqueta", "Cinturón", "Falda", "Calzoncillos",
+                "Gorra", "Gorro", "Medias", "Pantalón", "Pantalones cortos", "Reloj", "Ropa deportiva", "Sujetador",
+                "Sudadera", "Traje de baño", "Vaqueros", "Vestido", "Zapatillas", "Zapatos"
         );
         return crearCategoriaConFlashCards(CATEGORIA_VESTIMENTA, nombresVestimenta);
     }
@@ -129,8 +129,8 @@ public class DataLoader implements CommandLineRunner {
         List<String> nombresLugares = Arrays.asList(
                 "Baile", "Baño", "Calle", "Casa", "Cine", "Cocina", "Comisaría", "Dormitorio", "Escuela", "Escalera",
                 "Estadio", "Hospital", "Lavadero", "Panadería", "Patio de Escuela", "Plaza", "Pollería", "Quiosco",
-                "Restaurante", "Salón", "Supermercado", "Tienda de Ropa hombre", "Tienda de Ropa mujer", "Universidad",
-                "Verdulería", "Zapatería"
+                "Restaurante", "Salón", "Supermercado", "Tienda de Ropa", "Universidad",
+                "Fruteria", "Zapatería"
         );
         return crearCategoriaConFlashCards(CATEGORIA_LUGARES, nombresLugares);
     }
@@ -145,7 +145,7 @@ public class DataLoader implements CommandLineRunner {
                 "Ambulancia", "Ayuda", "Bombero", "Borracho", "Choque", "Ciego", "Discapacidad", "Doctor", "Dolor",
                 "Dolor de brazo", "Dolor de cabeza", "Dolor de estómago", "Dolor de espalda", "Dolor de garganta",
                 "Dolor de muela", "Dolor de oído", "Enfermera", "Escalera", "Fiebre", "Incendio", "Inyección",
-                "Lastimadura", "Pelea", "Policía", "Resfrío", "Robo", "Salida de emergencia", "Sordo"
+                "Lastimar", "Pelea", "Policía", "Resfrío", "Robo", "Salida de emergencia", "Sordo"
         );
         return crearCategoriaConFlashCards(CATEGORIA_EMERGENCIA_NECESIDADES, nombresEmergencia);
     }
@@ -204,7 +204,7 @@ public class DataLoader implements CommandLineRunner {
      */
     private Categoria crearCategoriaObjetos() {
         List<String> nombresObjetos = Arrays.asList(
-                "Aire Acondicionado", "Bolígrafos", "Computadora", "Cuaderno", "Escritorio", "Lámpara", "Libro", "Lápiz",
+                "Aire Acondicionado", "Bolígrafos", "Ordenador", "Cuaderno", "Escritorio", "Lámpara", "Libro", "Lápiz",
                 "Mesa", "Pelota", "Robot", "Silla", "Tablet", "Teléfono", "Televisión", "Ventilador"
         );
         return crearCategoriaConFlashCards(CATEGORIA_OBJETOS, nombresObjetos);
@@ -222,22 +222,16 @@ public class DataLoader implements CommandLineRunner {
         );
         return crearCategoriaConFlashCards(CATEGORIA_SENTIMIENTOS, nombresSentimientos);
     }
-
     /**
      * Crea la categoría "Mis Datos" con sus flashcards.
      *
      * @return Categoría "Mis Datos".
      */
     private Categoria crearCategoriaMisDatos() {
-        Categoria misDatos = new Categoria();
-        misDatos.setNombre(CATEGORIA_MIS_DATOS);
-
-        List<FlashCard> flashCards = new ArrayList<>();
-        flashCards.add(crearFlashCard("Mi nombre es Juan", "mi_nombre.mp3", misDatos));
-        flashCards.add(crearFlashCard("Mi edad es 30 años", "mi_edad.mp3", misDatos));
-
-        misDatos.setFlashCards(flashCards);
-        return misDatos;
+        return crearCategoriaConFlashCards(CATEGORIA_MIS_DATOS, Arrays.asList(
+                "Mi nombre es Juan",
+                "Mi edad es 30 años"
+        ));
     }
 
     /**
@@ -253,25 +247,26 @@ public class DataLoader implements CommandLineRunner {
 
         List<FlashCard> flashCards = new ArrayList<>();
         for (String nombre : nombres) {
-            flashCards.add(crearFlashCard(nombre, nombre + MP3_EXTENSION, categoria));
+            String rutaImagen = nombre.toLowerCase().replace(" ", "_") + ".png"; // Genera la ruta de la imagen
+            flashCards.add(crearFlashCard(nombre, nombre + MP3_EXTENSION, rutaImagen, categoria));
         }
 
         categoria.setFlashCards(flashCards);
         return categoria;
     }
-
     /**
-     * Crea una flashcard con el texto, ruta de audio y categoría asociada.
+     * Crea una flashcard con el texto, ruta de audio y categoría especificados.
      *
      * @param texto Texto de la flashcard.
      * @param rutaAudio Ruta del archivo de audio.
      * @param categoria Categoría a la que pertenece la flashcard.
-     * @return Flashcard creada.
+     * @return FlashCard creada.
      */
-    private FlashCard crearFlashCard(String texto, String rutaAudio, Categoria categoria) {
+    private FlashCard crearFlashCard(String texto, String rutaAudio, String rutaImagen, Categoria categoria) {
         FlashCard flashCard = new FlashCard();
         flashCard.setTexto(texto);
         flashCard.setRutaAudio(rutaAudio);
+        flashCard.setRutaImagen(rutaImagen);
         flashCard.setCategoria(categoria);
         return flashCard;
     }
