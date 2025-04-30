@@ -1,8 +1,8 @@
 package es.luka.flashcards.config;
 
-import es.luka.flashcards.models.Categoria;
-import es.luka.flashcards.models.FlashCard;
-import es.luka.flashcards.repositories.CategoriaRepository;
+import es.luka.flashcards.model.Categoria;
+import es.luka.flashcards.model.FlashCard;
+import es.luka.flashcards.repository.CategoriaRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

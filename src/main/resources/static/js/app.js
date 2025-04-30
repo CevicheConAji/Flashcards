@@ -1,5 +1,5 @@
 // URL base de la API
-const API_BASE_URL = "http://192.168.0.20:8080/api";
+const API_BASE_URL = "/api";
 
 // Evento que se ejecuta cuando el DOM está completamente cargado
 document.addEventListener("DOMContentLoaded", () => {

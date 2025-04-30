@@ -1,4 +1,4 @@
-package es.luka.flashcards.models;
+package es.luka.flashcards.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;

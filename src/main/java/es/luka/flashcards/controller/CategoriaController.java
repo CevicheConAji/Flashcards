@@ -1,10 +1,8 @@
-package es.luka.flashcards.controllers;
+package es.luka.flashcards.controller;
 
-import es.luka.flashcards.models.Categoria;
-import es.luka.flashcards.models.FlashCard;
-import es.luka.flashcards.repositories.CategoriaRepository;
-import es.luka.flashcards.repositories.FlashCardRepository;
-import org.springframework.http.HttpStatus;
+import es.luka.flashcards.model.Categoria;
+import es.luka.flashcards.repository.CategoriaRepository;
+import es.luka.flashcards.repository.FlashCardRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

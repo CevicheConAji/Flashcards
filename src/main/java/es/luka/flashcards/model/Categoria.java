@@ -1,6 +1,5 @@
-package es.luka.flashcards.models;
+package es.luka.flashcards.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
