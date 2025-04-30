@@ -86,7 +86,7 @@ public class DataLoader implements CommandLineRunner {
      */
     private Categoria crearCategoriaVestimenta() {
         List<String> nombresVestimenta = Arrays.asList(
-                "Americana", "Gafas", "Blusa", "Botas", "Bragas", "Bufanda", "Camisa","Chaqueta", "Cinturón", "Falda", "Calzoncillos",
+                "Americana", "Gafas", "Blusa", "Botas", "Bragas", "Bufanda", "Camisa", "Camiseta","Chaqueta", "Cinturón", "Falda", "Calzoncillos",
                 "Gorra", "Gorro", "Medias", "Pantalón", "Pantalones cortos", "Reloj", "Ropa deportiva", "Sujetador",
                 "Sudadera", "Traje de baño", "Vaqueros", "Vestido", "Zapatillas", "Zapatos"
         );
