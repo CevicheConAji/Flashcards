@@ -1,41 +1,53 @@
-// URL base de la API
-const API_BASE_URL = "/api";
+// Alternativa (al inicio de auth.js)
+if (typeof window.API_BASE_URL === 'undefined') {
+    window.API_BASE_URL = "/api";
+}
 
-// Función para verificar si el usuario está autenticado
-async function verificarAutenticacion() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/status`);
-        const data = await response.json();
 
-        actualizarInterfazUsuario(data.authenticated, data.username);
+// Función para verificar el estado de autenticación del usuario
+function verificarAutenticacion() {
+    const token = localStorage.getItem('token');
+    const username = localStorage.getItem('usuario');
 
-        return data.authenticated;
-    } catch (error) {
-        console.error("Error al verificar autenticación:", error);
-        // Si hay error, asumimos que no está autenticado
-        actualizarInterfazUsuario(false);
-        return false;
-    }
+    // Actualizar la interfaz según el estado de autenticación
+    actualizarInterfazUsuario(!!username, username);
 }
 
 // Función para actualizar la interfaz según el estado de autenticación
 function actualizarInterfazUsuario(autenticado, username) {
-    const authLinks = document.getElementById('auth-links');
+    const navbarNav = document.getElementById('navbarNav');
+    const itemLogin = document.querySelector('a[href="/login.html"]')?.parentElement;
+    const itemRegistro = document.querySelector('a[href="/registry.html"]')?.parentElement;
+    const itemLogout = document.getElementById('logout-item');
 
-    if (!authLinks) return;
+    if (navbarNav && itemLogin && itemRegistro && itemLogout) {
+        if (autenticado) {
+            // Usuario autenticado: ocultar login/registro, mostrar logout y nombre de usuario
+            itemLogin.style.display = 'none';
+            itemRegistro.style.display = 'none';
+            itemLogout.style.display = 'block';
 
-    if (autenticado) {
-        // Usuario autenticado
-        authLinks.innerHTML = `
-            <span class="navbar-text me-3">Hola, ${username}</span>
-            <button onclick="cerrarSesion()" class="btn btn-outline-light">Cerrar Sesión</button>
-        `;
-    } else {
-        // Usuario no autenticado
-        authLinks.innerHTML = `
-            <a href="/login.html" class="btn btn-outline-light me-2">Iniciar Sesión</a>
-            <a href="/registry.html" class="btn btn-primary">Registrarse</a>
-        `;
+            // Agregar nombre de usuario si no existe
+            let userInfoItem = document.getElementById('user-info-item');
+            if (!userInfoItem) {
+                userInfoItem = document.createElement('li');
+                userInfoItem.id = 'user-info-item';
+                userInfoItem.className = 'nav-item';
+                userInfoItem.innerHTML = `<span class="nav-link">Hola, ${username}</span>`;
+                navbarNav.insertBefore(userInfoItem, itemLogout);
+            }
+        } else {
+            // Usuario no autenticado: mostrar login/registro, ocultar logout
+            itemLogin.style.display = 'block';
+            itemRegistro.style.display = 'block';
+            itemLogout.style.display = 'none';
+
+            // Eliminar nombre de usuario si existe
+            const userInfoItem = document.getElementById('user-info-item');
+            if (userInfoItem) {
+                userInfoItem.remove();
+            }
+        }
     }
 }
 
@@ -48,29 +60,48 @@ if (loginForm) {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
+        // Mostrar indicador de carga
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+
+        // Limpiar mensajes de error previos
+        const errorDiv = document.getElementById('error-message');
+        if (errorDiv) errorDiv.classList.add('d-none');
+
         fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username, password }),
-            credentials: 'include' // Importante para mantener la sesión
+            body: JSON.stringify({ username, password })
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showError(data.error);
-                } else {
-                    // Guardar información de sesión
-                    localStorage.setItem('usuario', data.usuario);
-
-                    // Redirigir a la página principal
-                    window.location.href = '/';
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Credenciales inválidas');
                 }
+                return response.json();
+            })
+            .then(data => {
+                // Guardar información de sesión
+                localStorage.setItem('token', 'jwt-token-simulado');
+                localStorage.setItem('usuario', data.username);
+
+                // Redirigir a la página principal
+                window.location.href = '/?loginExitoso=true';
             })
             .catch(error => {
-                showError('Error en el servidor. Intente nuevamente.');
                 console.error('Error:', error);
+                if (errorDiv) {
+                    errorDiv.textContent = error.message;
+                    errorDiv.classList.remove('d-none');
+                }
+            })
+            .finally(() => {
+                // Restaurar el botón
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
             });
     });
 }
@@ -92,26 +123,34 @@ if (registroForm) {
             return;
         }
 
+        // Mostrar indicador de carga
+        const submitButton = registroForm.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+
         fetch(`${API_BASE_URL}/auth/registro`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username, email, password }),
-            credentials: 'include' // Importante para mantener la sesión
+            body: JSON.stringify({ username, email, password })
         })
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    showError(data.error);
-                } else {
-                    // Redirigir a la página de login
-                    window.location.href = '/login.html?registroExitoso=true';
+                    throw new Error(data.error);
                 }
+                // Redirigir a la página de login con un mensaje de éxito
+                window.location.href = '/login.html?registroExitoso=true';
             })
             .catch(error => {
-                showError('Error en el servidor. Intente nuevamente.');
-                console.error('Error:', error);
+                showError(error.message);
+            })
+            .finally(() => {
+                // Restaurar el botón
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
             });
     });
 }
@@ -122,38 +161,87 @@ function showError(message) {
     if (errorDiv) {
         errorDiv.textContent = message;
         errorDiv.classList.remove('d-none');
+
+        // Hacer scroll al mensaje de error
+        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 }
 
-// Cerrar sesión
-async function cerrarSesion() {
-    try {
-        await fetch(`${API_BASE_URL}/auth/logout`, {
-            method: 'POST',
-            credentials: 'include'
+// Función unificada para cerrar sesión
+function logout() {
+    // Llamar al endpoint de cierre de sesión
+    fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(() => {
+            // Limpiar datos de sesión local
+            localStorage.removeItem('token');
+            localStorage.removeItem('usuario');
+
+            // Redirigir a la página principal
+            window.location.href = '/';
+        })
+        .catch(error => {
+            console.error('Error en logout:', error);
+
+            // Incluso si hay error, intentar limpiar datos locales
+            localStorage.removeItem('token');
+            localStorage.removeItem('usuario');
+            window.location.href = '/';
         });
-
-        // Eliminar datos de sesión del localStorage
-        localStorage.removeItem('usuario');
-
-        // Redirigir a la página principal
-        window.location.href = '/';
-    } catch (error) {
-        console.error("Error al cerrar sesión:", error);
-    }
 }
 
 // Verificar si hay mensaje de registro exitoso
 function checkRegistroExitoso() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('registroExitoso') === 'true') {
-        const successDiv = document.createElement('div');
-        successDiv.className = 'alert alert-success';
-        successDiv.textContent = 'Registro exitoso. Por favor inicia sesión.';
+        // Mostrar mensaje de éxito
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-success mb-4';
+        alertDiv.role = 'alert';
+        alertDiv.textContent = '¡Registro exitoso! Ya puedes iniciar sesión.';
 
-        const form = document.getElementById('login-form');
-        if (form) {
-            form.parentNode.insertBefore(successDiv, form);
+        const container = document.querySelector('.container');
+        if (container && container.firstChild) {
+            container.insertBefore(alertDiv, container.firstChild);
+
+            // Eliminar el mensaje después de 5 segundos
+            setTimeout(() => {
+                alertDiv.remove();
+                // Limpiar el parámetro de la URL
+                const url = new URL(window.location.href);
+                url.searchParams.delete('registroExitoso');
+                window.history.replaceState({}, document.title, url);
+            }, 5000);
+        }
+    }
+}
+
+// Función para verificar si el inicio de sesión fue exitoso
+function checkLoginExitoso() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('loginExitoso') === 'true') {
+        // Mostrar mensaje de éxito
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-success mb-4';
+        alertDiv.role = 'alert';
+        alertDiv.textContent = '¡Has iniciado sesión correctamente!';
+
+        const container = document.querySelector('.container');
+        if (container && container.firstChild) {
+            container.insertBefore(alertDiv, container.firstChild);
+
+            // Eliminar el mensaje después de 5 segundos
+            setTimeout(() => {
+                alertDiv.remove();
+                // Limpiar el parámetro de la URL
+                const url = new URL(window.location.href);
+                url.searchParams.delete('loginExitoso');
+                window.history.replaceState({}, document.title, url);
+            }, 5000);
         }
     }
 }
@@ -162,4 +250,5 @@ function checkRegistroExitoso() {
 document.addEventListener('DOMContentLoaded', () => {
     verificarAutenticacion();
     checkRegistroExitoso();
+    checkLoginExitoso();
 });

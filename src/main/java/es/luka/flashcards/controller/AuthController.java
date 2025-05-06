@@ -83,4 +83,24 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
+    /**
+     * Endpoint para cerrar sesión.
+     *
+     * @return Respuesta con confirmación del cierre de sesión.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<?> cerrarSesion() {
+        // Obtener la autenticación actual
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            // Limpiar el contexto de seguridad
+            SecurityContextHolder.clearContext();
+        }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", "Sesión cerrada correctamente");
+
+        return ResponseEntity.ok(response);
+    }
 }
