@@ -3,6 +3,9 @@ window.API_BASE_URL = "/api";
 
 // Evento que se ejecuta cuando el DOM está completamente cargado
 document.addEventListener("DOMContentLoaded", () => {
+    cargarModoPreferido(); // Cargar el modo preferido al iniciar
+    agregarBotonModoOscuro(); // Agregar el botón de modo oscuro a la barra de navegación
+
     cargarCategorias();
     cargarFlashCardsMasUsadas(); // Cargar las flashcards más usadas inicialmente
 
@@ -253,5 +256,95 @@ function playAudio(audioFile, flashcardId) {
     // Si se proporciona ID, registrar el uso
     if (flashcardId) {
         registrarUsoFlashCard(flashcardId);
+    }
+}
+// Función para alternar entre modo claro y oscuro
+function toggleModoOscuro() {
+    document.body.classList.toggle('dark-mode');
+    const modoActual = document.body.classList.contains('dark-mode') ? 'oscuro' : 'claro';
+    localStorage.setItem('modoPreferido', modoActual);
+
+    // Actualizar el icono del botón
+    const modeIcon = document.querySelector('.mode-toggle-icon');
+    if (modeIcon) {
+        modeIcon.className = document.body.classList.contains('dark-mode') ?
+            'bi bi-sun mode-toggle-icon' : 'bi bi-moon mode-toggle-icon';
+    }
+}
+
+// Cargar preferencia guardada cuando se inicia la aplicación
+function cargarModoPreferido() {
+    const modoGuardado = localStorage.getItem('modoPreferido');
+    if (modoGuardado === 'oscuro') {
+        document.body.classList.add('dark-mode');
+
+        // Actualizar el icono si existe
+        const modeIcon = document.querySelector('.mode-toggle-icon');
+        if (modeIcon) {
+            modeIcon.className = 'bi bi-sun mode-toggle-icon';
+        }
+    }
+}
+
+// Agregar el botón de alternar modo a la barra de navegación
+function agregarBotonModoOscuro() {
+    const navbarNav = document.querySelector('.navbar-nav');
+    if (navbarNav) {
+        // Crear elemento para el botón
+        const modeToggleItem = document.createElement('li');
+        modeToggleItem.className = 'nav-item';
+        modeToggleItem.id = 'mode-toggle';
+
+        // Determinar el icono inicial según el modo actual
+        const iconClass = document.body.classList.contains('dark-mode') ?
+            'bi bi-sun mode-toggle-icon' : 'bi bi-moon mode-toggle-icon';
+
+        modeToggleItem.innerHTML = `
+            <a class="nav-link" href="#" aria-label="Cambiar modo oscuro/claro">
+                <i class="${iconClass}"></i>
+            </a>
+        `;
+
+        // Agregar evento al botón
+        modeToggleItem.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleModoOscuro();
+        });
+
+        // Insertar al final de la barra de navegación
+        navbarNav.appendChild(modeToggleItem);
+    }
+}
+
+// Agregar a app.js - Detección de preferencia del sistema
+function detectarPreferenciaDelSistema() {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'oscuro';
+    }
+    return 'claro';
+}
+
+// Mejorar la función de carga del modo preferido
+function cargarModoPreferido() {
+    let modoGuardado = localStorage.getItem('modoPreferido');
+
+    // Si no hay preferencia guardada, usar la del sistema
+    if (!modoGuardado) {
+        modoGuardado = detectarPreferenciaDelSistema();
+        localStorage.setItem('modoPreferido', modoGuardado);
+    }
+
+    if (modoGuardado === 'oscuro') {
+        document.body.classList.add('dark-mode');
+        actualizarIconoModoOscuro(true);
+    }
+}
+
+// Función para actualizar el icono según el modo
+function actualizarIconoModoOscuro(esModoOscuro) {
+    const modeIcon = document.querySelector('.mode-toggle-icon');
+    if (modeIcon) {
+        modeIcon.className = esModoOscuro ?
+            'bi bi-sun mode-toggle-icon' : 'bi bi-moon mode-toggle-icon';
     }
 }

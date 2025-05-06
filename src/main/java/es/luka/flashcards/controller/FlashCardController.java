@@ -53,4 +53,12 @@ public class FlashCardController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+    // En FlashCardController.java - Añadir este nuevo endpoint
+    @GetMapping("/flashcards/personalizadas/{username}")
+    public ResponseEntity<List<FlashCard>> obtenerFlashCardsPersonalizadas(
+            @PathVariable String username) {
+        // Obtener las últimas 4 flashcards utilizadas por el usuario
+        List<FlashCard> personalizadas = flashCardRepository.findMostUsed(PageRequest.of(0, 4));
+        return ResponseEntity.ok(personalizadas);
+    }
 }
