@@ -20,6 +20,9 @@ public class FlashCard {
     @JsonBackReference // Evita serialización cíclica en JSON
     private Categoria categoria;
 
+    @Column(name = "contador_uso", nullable = false)
+    private Integer contadorUso = 0;
+
     // Getters y Setters
 
     public Long getId() {
@@ -60,5 +63,17 @@ public class FlashCard {
 
     public void setRutaImagen(String rutaImagen) {
         this.rutaImagen = rutaImagen;
+    }
+
+    public Integer getContadorUso() {
+        return contadorUso;
+    }
+
+    public void setContadorUso(Integer contadorUso) {
+        this.contadorUso = contadorUso;
+    }
+
+    public void incrementarContador() {
+        this.contadorUso++;
     }
 }
