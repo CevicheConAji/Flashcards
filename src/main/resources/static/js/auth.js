@@ -356,4 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
     verificarAutenticacion();
     checkRegistroExitoso();
     checkLoginExitoso();
+
+    // Asegurar que el modo oscuro funcione correctamente
+    if (typeof cargarModoPreferido === 'function') {
+        cargarModoPreferido();
+    }
 });

@@ -6,38 +6,55 @@ document.addEventListener("DOMContentLoaded", () => {
     cargarModoPreferido(); // Cargar el modo preferido al iniciar
     agregarBotonModoOscuro(); // Agregar el botón de modo oscuro a la barra de navegación
 
-    cargarCategorias();
-    cargarFlashCardsMasUsadas(); // Cargar las flashcards más usadas inicialmente
+    // Verificar si estamos en la página principal
+    const esIndexPage = window.location.pathname === '/' ||
+        window.location.pathname === '/index.html';
 
-    // Agregar evento al botón de actualizar flashcards más usadas
-    const btnActualizarPopulares = document.getElementById('btn-actualizar-populares');
-    if (btnActualizarPopulares) {
-        btnActualizarPopulares.addEventListener('click', () => {
-            // Cambiar el icono a un spinner mientras se carga
-            btnActualizarPopulares.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Actualizando...';
-            btnActualizarPopulares.disabled = true;
+    // Solo cargar categorías y flashcards si estamos en la página principal
+    if (esIndexPage) {
+        cargarCategorias();
+        cargarFlashCardsMasUsadas(); // Cargar las flashcards más usadas inicialmente
 
-            // Cargar flashcards más usadas
-            actualizarFlashCardsMasUsadas()
-                .finally(() => {
-                    // Restaurar el botón después de la carga
-                    setTimeout(() => {
-                        btnActualizarPopulares.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Actualizar';
-                        btnActualizarPopulares.disabled = false;
-                    }, 500);
-                });
-        });
+        // Agregar evento al botón de actualizar flashcards más usadas
+        const btnActualizarPopulares = document.getElementById('btn-actualizar-populares');
+        if (btnActualizarPopulares) {
+            btnActualizarPopulares.addEventListener('click', () => {
+                // Cambiar el icono a un spinner mientras se carga
+                btnActualizarPopulares.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Actualizando...';
+                btnActualizarPopulares.disabled = true;
+
+                // Cargar flashcards más usadas
+                actualizarFlashCardsMasUsadas()
+                    .finally(() => {
+                        // Restaurar el botón después de la carga
+                        setTimeout(() => {
+                            btnActualizarPopulares.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Actualizar';
+                            btnActualizarPopulares.disabled = false;
+                        }, 500);
+                    });
+            });
+        }
     }
 });
 
 // Función para cargar las categorías desde la API
 function cargarCategorias() {
-    fetch(`${API_BASE_URL}/categorias`)
-        .then(response => response.json())
-        .then(data => renderizarCategorias(data))
+    fetch(`${window.API_BASE_URL}/categorias`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
+        .then(categorias => {
+            renderizarCategorias(categorias);
+        })
         .catch(error => {
-            console.error("Error cargando categorías:", error);
-            alert("Ocurrió un error al cargar las categorías.");
+            console.error('Error al cargar categorías:', error);
+            const categoriesContainer = document.getElementById('categories');
+            if (categoriesContainer) {
+                categoriesContainer.innerHTML = '<p class="text-center text-danger">Ocurrió un error al cargar las categorías.</p>';
+            }
         });
 }
 
