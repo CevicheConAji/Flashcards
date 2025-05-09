@@ -87,7 +87,7 @@ public class DataLoader implements CommandLineRunner {
     private Categoria crearCategoriaVestimenta() {
         List<String> nombresVestimenta = Arrays.asList(
                 "Americana", "Gafas", "Blusa", "Botas", "Bragas", "Bufanda", "Camisa", "Camiseta","Chaqueta", "Cinturón", "Falda", "Calzoncillos",
-                "Gorra", "Gorro", "Medias", "Pantalón", "Pantalones cortos", "Reloj", "Ropa deportiva", "Sujetador",
+                "Gorra", "Gorro", "Calcetín", "Pantalón", "Pantalones cortos", "Reloj", "Ropa deportiva", "Sujetador",
                 "Sudadera", "Traje de baño", "Vaqueros", "Vestido", "Zapatillas", "Zapatos"
         );
         return crearCategoriaConFlashCards(CATEGORIA_VESTIMENTA, nombresVestimenta);
@@ -204,8 +204,8 @@ public class DataLoader implements CommandLineRunner {
      */
     private Categoria crearCategoriaObjetos() {
         List<String> nombresObjetos = Arrays.asList(
-                "Aire Acondicionado", "Bolígrafos", "Ordenador", "Cuaderno", "Escritorio", "Lámpara", "Libro", "Lápiz",
-                "Mesa", "Pelota", "Robot", "Silla", "Tablet", "Teléfono", "Televisión", "Ventilador"
+                "Aire Acondicionado", "Bolígrafo", "Ordenador", "Libreta", "Escritorio", "Lámpara", "Libro", "Lápiz",
+                "Mesa", "Pelota", "Robot", "Silla", "Tablet", "Móvil", "Televisión", "Ventilador"
         );
         return crearCategoriaConFlashCards(CATEGORIA_OBJETOS, nombresObjetos);
     }
