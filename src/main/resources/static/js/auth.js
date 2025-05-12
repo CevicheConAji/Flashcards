@@ -1,10 +1,19 @@
-// Alternativa (al inicio de auth.js)
+/**
+ * Módulo de autenticación y gestión de usuarios
+ */
+
+// Configuración de la URL base API
 if (typeof window.API_BASE_URL === 'undefined') {
     window.API_BASE_URL = "/api";
 }
 
+/**
+ * GESTIÓN DE AUTENTICACIÓN
+ */
 
-// Función para verificar el estado de autenticación del usuario
+/**
+ * Verifica el estado de autenticación del usuario y actualiza la UI
+ */
 function verificarAutenticacion() {
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('usuario');
@@ -13,7 +22,11 @@ function verificarAutenticacion() {
     actualizarInterfazUsuario(!!username, username);
 }
 
-// Función para actualizar la interfaz según el estado de autenticación
+/**
+ * Actualiza los elementos de la interfaz según el estado de autenticación
+ * @param {boolean} autenticado - Indica si el usuario está autenticado
+ * @param {string} username - Nombre de usuario
+ */
 function actualizarInterfazUsuario(autenticado, username) {
     const itemLogin = document.querySelector('.navbar-nav .nav-link[href="/login.html"]')?.parentNode;
     const itemRegistro = document.querySelector('.navbar-nav .nav-link[href="/registry.html"]')?.parentNode;
@@ -29,10 +42,6 @@ function actualizarInterfazUsuario(autenticado, username) {
             itemLogin.style.display = 'none';
             itemRegistro.style.display = 'none';
             itemLogout.style.display = 'block';
-
-            // Si estás redireccionando después de la autenticación, asegúrate
-            // de mostrar la sección personalizada para el usuario autenticado
-            mostrarContenidoPersonalizado(username);
         } else {
             // Si no está autenticado, muestra login/registro y oculta logout
             itemLogin.style.display = 'block';
@@ -40,125 +49,185 @@ function actualizarInterfazUsuario(autenticado, username) {
             itemLogout.style.display = 'none';
         }
 
-        // Siempre asegúrate de que el botón de modo oscuro esté presente
-        // Si ya existía, simplemente asegúrate que esté al final
-        if (modeToggleItem) {
-            // Quitar y volver a agregar al final
-            navbarNav.appendChild(modeToggleItem);
-        } else {
-            // Si no existe, crear uno nuevo usando la función de app.js
-            if (typeof agregarBotonModoOscuro === 'function') {
-                agregarBotonModoOscuro();
-            }
+        // Gestionar el botón de modo oscuro
+        gestionarBotonModoOscuro(navbarNav, modeToggleItem);
+    }
+}
+
+/**
+ * Gestiona la presencia del botón de modo oscuro
+ * @param {Element} navbarNav - Elemento de navegación
+ * @param {Element|null} modeToggleItem - Botón existente de modo oscuro
+ */
+function gestionarBotonModoOscuro(navbarNav, modeToggleItem) {
+    if (modeToggleItem) {
+        // Quitar y volver a agregar al final
+        navbarNav.appendChild(modeToggleItem);
+    } else {
+        // Si no existe, crear uno nuevo usando la función de app.js
+        if (typeof agregarBotonModoOscuro === 'function') {
+            agregarBotonModoOscuro();
         }
     }
 }
 
-// Manejo del formulario de login
-const loginForm = document.getElementById('login-form');
-if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-
-        // Mostrar indicador de carga
-        const submitButton = loginForm.querySelector('button[type="submit"]');
-        const originalText = submitButton.innerHTML;
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
-
-        // Limpiar mensajes de error previos
-        const errorDiv = document.getElementById('error-message');
-        if (errorDiv) errorDiv.classList.add('d-none');
-
-        fetch(`${API_BASE_URL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Credenciales inválidas');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Guardar información de sesión
-                localStorage.setItem('token', 'jwt-token-simulado');
-                localStorage.setItem('usuario', data.username);
-
-                // Redirigir a la página principal
-                window.location.href = '/?loginExitoso=true';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                if (errorDiv) {
-                    errorDiv.textContent = error.message;
-                    errorDiv.classList.remove('d-none');
-                }
-            })
-            .finally(() => {
-                // Restaurar el botón
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalText;
-            });
-    });
-}
-
-// Manejo del formulario de registro
-const registroForm = document.getElementById('registro-form');
-if (registroForm) {
-    registroForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const username = document.getElementById('username').value;
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirm-password').value;
-
-        // Validar que las contraseñas coincidan
-        if (password !== confirmPassword) {
-            showError('Las contraseñas no coinciden');
-            return;
+/**
+ * Cierra la sesión del usuario
+ */
+function logout() {
+    // Llamar al endpoint de cierre de sesión
+    fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
         }
-
-        // Mostrar indicador de carga
-        const submitButton = registroForm.querySelector('button[type="submit"]');
-        const originalText = submitButton.innerHTML;
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
-
-        fetch(`${API_BASE_URL}/auth/registro`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, email, password })
+    })
+        .then(() => {
+            finalizarSesion();
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                // Redirigir a la página de login con un mensaje de éxito
-                window.location.href = '/login.html?registroExitoso=true';
-            })
-            .catch(error => {
-                showError(error.message);
-            })
-            .finally(() => {
-                // Restaurar el botón
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalText;
-            });
-    });
+        .catch(error => {
+            console.error('Error en logout:', error);
+            // Incluso si hay error, finalizar sesión localmente
+            finalizarSesion();
+        });
 }
 
-// Función para mostrar mensajes de error
+/**
+ * Finaliza la sesión limpiando el almacenamiento local y redirigiendo
+ */
+function finalizarSesion() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    window.location.href = '/';
+}
+
+/**
+ * FORMULARIOS DE AUTENTICACIÓN
+ */
+
+// Inicializar los formularios cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', inicializarFormularios);
+
+/**
+ * Inicializa los formularios de login y registro
+ */
+function inicializarFormularios() {
+    // Inicializar el formulario de login
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', manejarFormularioLogin);
+    }
+
+    // Inicializar el formulario de registro
+    const registroForm = document.getElementById('registro-form');
+    if (registroForm) {
+        registroForm.addEventListener('submit', manejarFormularioRegistro);
+    }
+}
+
+/**
+ * Maneja el envío del formulario de login
+ * @param {Event} e - Evento del formulario
+ */
+function manejarFormularioLogin(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const submitButton = document.querySelector('#login-form button[type="submit"]');
+
+    // Mostrar indicador de carga
+    const originalText = submitButton.innerHTML;
+    toggleBotonCarga(submitButton, true);
+
+    // Limpiar mensajes de error previos
+    ocultarError();
+
+    fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Credenciales inválidas');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Guardar información de sesión
+            localStorage.setItem('token', 'jwt-token-simulado');
+            localStorage.setItem('usuario', data.username);
+
+            // Redirigir a la página principal
+            window.location.href = '/?loginExitoso=true';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError(error.message);
+        })
+        .finally(() => {
+            toggleBotonCarga(submitButton, false, originalText);
+        });
+}
+
+/**
+ * Maneja el envío del formulario de registro
+ * @param {Event} e - Evento del formulario
+ */
+function manejarFormularioRegistro(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    // Validar que las contraseñas coincidan
+    if (password !== confirmPassword) {
+        showError('Las contraseñas no coinciden');
+        return;
+    }
+
+    const submitButton = document.querySelector('#registro-form button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+
+    // Mostrar indicador de carga
+    toggleBotonCarga(submitButton, true);
+
+    fetch(`${API_BASE_URL}/auth/registro`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, email, password })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            // Redirigir a la página de login con un mensaje de éxito
+            window.location.href = '/login.html?registroExitoso=true';
+        })
+        .catch(error => {
+            showError(error.message);
+        })
+        .finally(() => {
+            toggleBotonCarga(submitButton, false, originalText);
+        });
+}
+
+/**
+ * UTILIDADES
+ */
+
+/**
+ * Muestra un mensaje de error
+ * @param {string} message - Mensaje de error
+ */
 function showError(message) {
     const errorDiv = document.getElementById('error-message');
     if (errorDiv) {
@@ -170,192 +239,78 @@ function showError(message) {
     }
 }
 
-// Función unificada para cerrar sesión
-function logout() {
-    // Llamar al endpoint de cierre de sesión
-    fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(() => {
-            // Limpiar datos de sesión local
-            localStorage.removeItem('token');
-            localStorage.removeItem('usuario');
-
-            // Redirigir a la página principal
-            window.location.href = '/';
-        })
-        .catch(error => {
-            console.error('Error en logout:', error);
-
-            // Incluso si hay error, intentar limpiar datos locales
-            localStorage.removeItem('token');
-            localStorage.removeItem('usuario');
-            window.location.href = '/';
-        });
+/**
+ * Oculta el mensaje de error
+ */
+function ocultarError() {
+    const errorDiv = document.getElementById('error-message');
+    if (errorDiv) errorDiv.classList.add('d-none');
 }
 
-// Verificar si hay mensaje de registro exitoso
-function checkRegistroExitoso() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('registroExitoso') === 'true') {
-        // Mostrar mensaje de éxito
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-success mb-4';
-        alertDiv.role = 'alert';
-        alertDiv.textContent = '¡Registro exitoso! Ya puedes iniciar sesión.';
-
-        const container = document.querySelector('.container');
-        if (container && container.firstChild) {
-            container.insertBefore(alertDiv, container.firstChild);
-
-            // Eliminar el mensaje después de 5 segundos
-            setTimeout(() => {
-                alertDiv.remove();
-                // Limpiar el parámetro de la URL
-                const url = new URL(window.location.href);
-                url.searchParams.delete('registroExitoso');
-                window.history.replaceState({}, document.title, url);
-            }, 5000);
-        }
-    }
-}
-
-// Función para verificar si el inicio de sesión fue exitoso
-function checkLoginExitoso() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('loginExitoso') === 'true') {
-        // Mostrar mensaje de éxito
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-success mb-4';
-        alertDiv.role = 'alert';
-        alertDiv.textContent = '¡Has iniciado sesión correctamente!';
-
-        const container = document.querySelector('.container');
-        if (container && container.firstChild) {
-            container.insertBefore(alertDiv, container.firstChild);
-
-            // Eliminar el mensaje después de 5 segundos
-            setTimeout(() => {
-                alertDiv.remove();
-                // Limpiar el parámetro de la URL
-                const url = new URL(window.location.href);
-                url.searchParams.delete('loginExitoso');
-                window.history.replaceState({}, document.title, url);
-            }, 5000);
-        }
-    }
-}
-// Función para cargar flashcards personalizadas
-function cargarFlashcardsPersonalizadas(username) {
-    // Verificar si existe la sección personalizada
-    let seccionPersonalizada = document.getElementById('seccion-personalizada');
-
-    // Si no existe la sección y tenemos un usuario, crearla
-    if (!seccionPersonalizada && username) {
-        seccionPersonalizada = document.createElement('section');
-        seccionPersonalizada.id = 'seccion-personalizada';
-        seccionPersonalizada.className = 'container my-4 animate-entrada';
-        seccionPersonalizada.innerHTML = `
-            <h3 class="section-title">Hola ${username}, continúa aprendiendo</h3>
-            <div id="flashcards-personalizadas" class="row">
-                <div class="d-flex justify-content-center w-100">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Cargando...</span>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Insertar después del encabezado principal
-        const mainHeader = document.querySelector('.text-center.mb-5');
-        if (mainHeader) {
-            mainHeader.parentNode.insertBefore(seccionPersonalizada, mainHeader.nextSibling);
-
-            // Cargar las flashcards personalizadas
-            fetch(`${window.API_BASE_URL}/flashcards/personalizadas/${username}`)
-                .then(response => response.json())
-                .then(data => {
-                    renderizarFlashcardsPersonalizadas(data);
-                })
-                .catch(error => {
-                    console.error('Error al cargar flashcards personalizadas:', error);
-                    document.getElementById('flashcards-personalizadas').innerHTML =
-                        '<p class="text-center">No se pudieron cargar tus flashcards personalizadas.</p>';
-                });
-        }
-    }
-}
-
-// Función para renderizar las flashcards personalizadas
-function renderizarFlashcardsPersonalizadas(flashcards) {
-    const container = document.getElementById('flashcards-personalizadas');
-    if (!container) return;
-
-    // Limpiar el contenedor
-    container.innerHTML = '';
-
-    if (flashcards.length === 0) {
-        container.innerHTML = '<p class="text-center">Aún no tienes flashcards personalizadas. Comienza a explorar categorías.</p>';
-        return;
-    }
-
-    // Crear tarjetas para cada flashcard
-    flashcards.forEach(card => {
-        const col = document.createElement('div');
-        col.className = 'col-md-3 col-sm-6 mb-4';
-
-        const cardDiv = document.createElement('div');
-        cardDiv.className = 'card h-100 flashcard';
-        cardDiv.style.cursor = 'pointer';
-        cardDiv.onclick = () => mostrarDetalleFlashcard(card);
-
-        const cardImg = document.createElement('img');
-        cardImg.src = card.rutaImagen || 'img/placeholder.jpg';
-        cardImg.className = 'card-img-top';
-        cardImg.alt = card.texto;
-
-        const cardBody = document.createElement('div');
-        cardBody.className = 'card-body';
-        cardBody.innerHTML = `
-            <h5 class="card-title">${card.texto}</h5>
-            <p class="card-text"><small class="text-muted">Usado ${card.contadorUso} veces</small></p>
-        `;
-
-        cardDiv.appendChild(cardImg);
-        cardDiv.appendChild(cardBody);
-        col.appendChild(cardDiv);
-        container.appendChild(col);
-    });
-}
-
-// Modificar la función verificarAutenticacion para llamar a cargarFlashcardsPersonalizadas
-function verificarAutenticacion() {
-    const token = localStorage.getItem('token');
-    const username = localStorage.getItem('usuario');
-
-    // Actualizar la interfaz según el estado de autenticación
-    actualizarInterfazUsuario(!!username, username);
-
-    // Si hay un usuario autenticado, cargar flashcards personalizadas
-    if (username) {
-        cargarFlashcardsPersonalizadas(username);
+/**
+ * Activa/desactiva el estado de carga en un botón
+ * @param {HTMLElement} button - Elemento botón
+ * @param {boolean} isLoading - Estado de carga
+ * @param {string} originalText - Texto original del botón
+ */
+function toggleBotonCarga(button, isLoading, originalText = null) {
+    if (isLoading) {
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
     } else {
-        // Si no hay usuario, eliminar la sección personalizada si existe
-        const seccionPersonalizada = document.getElementById('seccion-personalizada');
-        if (seccionPersonalizada) {
-            seccionPersonalizada.remove();
-        }
+        button.disabled = false;
+        button.innerHTML = originalText;
     }
 }
 
-// Ejecutar verificación cuando carga la página
+/**
+ * Muestra una alerta temporal en la página
+ * @param {string} mensaje - Mensaje a mostrar
+ * @param {string} tipo - Tipo de alerta (success, warning, danger)
+ * @param {string} parametro - Parámetro URL a eliminar
+ */
+function mostrarAlerta(mensaje, tipo, parametro) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${tipo} mb-4`;
+    alertDiv.role = 'alert';
+    alertDiv.textContent = mensaje;
+
+    const container = document.querySelector('.container');
+    if (container && container.firstChild) {
+        container.insertBefore(alertDiv, container.firstChild);
+
+        // Eliminar el mensaje después de 5 segundos
+        setTimeout(() => {
+            alertDiv.remove();
+            // Limpiar el parámetro de la URL
+            const url = new URL(window.location.href);
+            url.searchParams.delete(parametro);
+            window.history.replaceState({}, document.title, url);
+        }, 5000);
+    }
+}
+
+/**
+ * Verifica mensajes de éxito en la URL
+ */
+function verificarMensajesExito() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Verificar registro exitoso
+    if (urlParams.get('registroExitoso') === 'true') {
+        mostrarAlerta('¡Registro exitoso! Ya puedes iniciar sesión.', 'success', 'registroExitoso');
+    }
+
+    // Verificar login exitoso
+    if (urlParams.get('loginExitoso') === 'true') {
+        mostrarAlerta('¡Has iniciado sesión correctamente!', 'success', 'loginExitoso');
+    }
+}
+
+// Inicialización cuando carga la página
 document.addEventListener('DOMContentLoaded', () => {
     verificarAutenticacion();
-    checkRegistroExitoso();
-    checkLoginExitoso();
+    verificarMensajesExito();
 
     // Asegurar que el modo oscuro funcione correctamente
     if (typeof cargarModoPreferido === 'function') {

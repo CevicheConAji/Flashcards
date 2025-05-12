@@ -1,43 +1,78 @@
-// URL base de la API
+/**
+ * CONFIGURACIÓN INICIAL
+ */
+
+// URL base para todas las llamadas a la API
 window.API_BASE_URL = "/api";
 
-// Evento que se ejecuta cuando el DOM está completamente cargado
-document.addEventListener("DOMContentLoaded", () => {
-    cargarModoPreferido(); // Cargar el modo preferido al iniciar
-    agregarBotonModoOscuro(); // Agregar el botón de modo oscuro a la barra de navegación
+/**
+ * INICIALIZACIÓN DE LA APLICACIÓN
+ */
 
+// Evento principal que se ejecuta cuando el DOM está completamente cargado
+document.addEventListener("DOMContentLoaded", () => {
+    inicializarInterfaz();
+    inicializarPaginaPrincipal();
+});
+
+/**
+ * Inicializa los elementos comunes de la interfaz en todas las páginas
+ */
+function inicializarInterfaz() {
+    // Configuración del tema oscuro/claro
+    cargarModoPreferido();
+    agregarBotonModoOscuro();
+}
+
+/**
+ * Inicializa elementos específicos de la página principal
+ */
+function inicializarPaginaPrincipal() {
     // Verificar si estamos en la página principal
     const esIndexPage = window.location.pathname === '/' ||
         window.location.pathname === '/index.html';
 
-    // Solo cargar categorías y flashcards si estamos en la página principal
-    if (esIndexPage) {
-        cargarCategorias();
-        cargarFlashCardsMasUsadas(); // Cargar las flashcards más usadas inicialmente
+    if (!esIndexPage) return;
 
-        // Agregar evento al botón de actualizar flashcards más usadas
-        const btnActualizarPopulares = document.getElementById('btn-actualizar-populares');
-        if (btnActualizarPopulares) {
-            btnActualizarPopulares.addEventListener('click', () => {
-                // Cambiar el icono a un spinner mientras se carga
-                btnActualizarPopulares.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Actualizando...';
-                btnActualizarPopulares.disabled = true;
+    // Cargar datos iniciales
+    cargarCategorias();
+    cargarFlashCardsMasUsadas();
 
-                // Cargar flashcards más usadas
-                actualizarFlashCardsMasUsadas()
-                    .finally(() => {
-                        // Restaurar el botón después de la carga
-                        setTimeout(() => {
-                            btnActualizarPopulares.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Actualizar';
-                            btnActualizarPopulares.disabled = false;
-                        }, 500);
-                    });
+    // Configurar botón de actualización de flashcards populares
+    configurarBotonActualizarPopulares();
+}
+
+/**
+ * Configura el comportamiento del botón para actualizar las flashcards populares
+ */
+function configurarBotonActualizarPopulares() {
+    const btnActualizarPopulares = document.getElementById('btn-actualizar-populares');
+    if (!btnActualizarPopulares) return;
+
+    btnActualizarPopulares.addEventListener('click', () => {
+        // Cambiar el icono a un spinner mientras se carga
+        btnActualizarPopulares.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Actualizando...';
+        btnActualizarPopulares.disabled = true;
+
+        // Cargar flashcards más usadas
+        actualizarFlashCardsMasUsadas()
+            .finally(() => {
+                // Restaurar el botón después de la carga
+                setTimeout(() => {
+                    btnActualizarPopulares.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Actualizar';
+                    btnActualizarPopulares.disabled = false;
+                }, 500);
             });
-        }
-    }
-});
+    });
+}
 
-// Función para cargar las categorías desde la API
+/**
+ * FUNCIONES PARA MANEJO DE CATEGORÍAS
+ */
+
+/**
+ * Carga las categorías desde la API y las muestra en la interfaz
+ */
 function cargarCategorias() {
     fetch(`${window.API_BASE_URL}/categorias`)
         .then(response => {
@@ -58,34 +93,40 @@ function cargarCategorias() {
         });
 }
 
-// Renderiza los botones de categorías en el contenedor
+/**
+ * Renderiza los botones de categorías en el contenedor
+ * @param {Array} categorias - Lista de objetos categoría
+ */
 function renderizarCategorias(categorias) {
     const categoryContainer = document.getElementById("category-buttons");
-    categoryContainer.innerHTML = ""; // Limpia el contenedor antes de agregar contenido
+    if (!categoryContainer) return;
+
+    categoryContainer.innerHTML = ""; // Limpia el contenedor
 
     categorias.forEach(categoria => {
         const btn = document.createElement("button");
-        btn.className = "btn btn-outline-primary category-button"; // Agrega la clase 'category-button'
+        btn.className = "btn btn-outline-primary category-button";
         btn.textContent = categoria.nombre;
-        // Agregar atributos de accesibilidad
+        // Atributos de accesibilidad
         btn.setAttribute("aria-label", `Seleccionar categoría ${categoria.nombre}`);
         btn.setAttribute("role", "listitem");
 
-        btn.onclick = () => {
-            console.log("Clicked category ID:", categoria.id);
-            showFlashCards(categoria.id);
-        };
+        btn.onclick = () => showFlashCards(categoria.id);
         categoryContainer.appendChild(btn);
     });
 }
 
-// Función para mostrar las flashcards de una categoría específica
-function showFlashCards(categoriaId) {
-    console.log("Loading flashcards for category ID:", categoriaId);
+/**
+ * FUNCIONES PARA MANEJO DE FLASHCARDS
+ */
 
+/**
+ * Carga y muestra las flashcards de una categoría específica
+ * @param {number} categoriaId - ID de la categoría
+ */
+function showFlashCards(categoriaId) {
     fetch(`${API_BASE_URL}/flashcards/${categoriaId}`)
         .then(response => {
-            console.log("Flashcard response status:", response.status);
             if (!response.ok) {
                 throw new Error("Error al cargar flashcards");
             }
@@ -94,7 +135,7 @@ function showFlashCards(categoriaId) {
         .then(data => {
             // Actualiza el nombre de la categoría
             document.getElementById("category-name").textContent = data.categoriaNombre || "Categoría desconocida";
-            // Renderiza las flashcards desde el campo "flashcards"
+            // Renderiza las flashcards
             renderizarFlashCards(data.flashcards);
         })
         .catch(error => {
@@ -103,17 +144,22 @@ function showFlashCards(categoriaId) {
         });
 }
 
-// Renderiza las flashcards en el contenedor
+/**
+ * Renderiza las flashcards en el contenedor
+ * @param {Array} flashcards - Lista de objetos flashcard
+ */
 function renderizarFlashCards(flashcards) {
     const container = document.getElementById("flashcard-container");
-    container.innerHTML = ""; // Limpia el contenedor antes de agregar contenido
+    if (!container) return;
+
+    container.innerHTML = "";
 
     if (!Array.isArray(flashcards) || flashcards.length === 0) {
         container.innerHTML = '<p class="text-muted">No hay flash cards para esta categoría.</p>';
         return;
     }
 
-    // Ordena las flashcards alfabéticamente por el texto
+    // Ordenar las flashcards alfabéticamente
     flashcards.sort((a, b) => a.texto.localeCompare(b.texto));
 
     flashcards.forEach(card => {
@@ -122,12 +168,12 @@ function renderizarFlashCards(flashcards) {
 
         const cardDiv = document.createElement("div");
         cardDiv.className = "card text-center shadow-sm flashcard";
-        cardDiv.onclick = () => playAudio(card.rutaAudio, card.id); // Modificado para incluir el ID
+        cardDiv.onclick = () => playAudio(card.rutaAudio, card.id);
 
         const img = document.createElement("img");
-        img.src = `/images/${card.rutaImagen}`; // Ruta de la imagen
-        img.className = "card-img-top img-fluid"; // Clase de Bootstrap para imágenes en tarjetas
-        img.alt = card.texto; // Texto alternativo
+        img.src = `/images/${card.rutaImagen}`;
+        img.className = "card-img-top img-fluid";
+        img.alt = card.texto;
 
         const body = document.createElement("div");
         body.className = "card-body";
@@ -137,18 +183,32 @@ function renderizarFlashCards(flashcards) {
         title.textContent = card.texto;
 
         body.appendChild(title);
-        cardDiv.appendChild(img); // Agrega la imagen al cardDiv
+        cardDiv.appendChild(img);
         cardDiv.appendChild(body);
         col.appendChild(cardDiv);
         container.appendChild(col);
     });
 
-    // Cambia la vista para mostrar las flashcards
+    // Cambiar la vista para mostrar las flashcards
     document.getElementById("categories").style.display = "none";
     document.getElementById("flashcards").style.display = "block";
 }
 
-// Función para cargar las flashcards más usadas (llamada inicial)
+/**
+ * Vuelve a la vista de categorías
+ */
+function showCategories() {
+    document.getElementById("flashcards").style.display = "none";
+    document.getElementById("categories").style.display = "block";
+}
+
+/**
+ * FUNCIONES PARA FLASHCARDS POPULARES
+ */
+
+/**
+ * Carga las flashcards más usadas (llamada inicial)
+ */
 function cargarFlashCardsMasUsadas() {
     fetch(`${API_BASE_URL}/flashcards/mas-usadas?limit=8`)
         .then(response => response.json())
@@ -164,9 +224,12 @@ function cargarFlashCardsMasUsadas() {
         });
 }
 
-// Función para actualizar las flashcards más usadas (devuelve promesa para el botón)
+/**
+ * Actualiza las flashcards más usadas (con feedback visual)
+ * @returns {Promise} - Promesa que se resuelve cuando termina la carga
+ */
 function actualizarFlashCardsMasUsadas() {
-    // Mostrar spinner en el contenedor mientras carga
+    // Mostrar spinner mientras carga
     const container = document.getElementById("most-used-flashcards");
     if (container) {
         container.innerHTML = `
@@ -193,10 +256,12 @@ function actualizarFlashCardsMasUsadas() {
         });
 }
 
-// Renderiza las flashcards más usadas en el contenedor correspondiente
+/**
+ * Renderiza las flashcards más usadas en el contenedor
+ * @param {Array} flashcards - Lista de objetos flashcard con contador de uso
+ */
 function renderizarFlashCardsMasUsadas(flashcards) {
     const container = document.getElementById("most-used-flashcards");
-
     if (!container) return;
 
     container.innerHTML = "";
@@ -246,7 +311,29 @@ function renderizarFlashCardsMasUsadas(flashcards) {
     container.appendChild(row);
 }
 
-// Función para registrar el uso de una flashcard
+/**
+ * FUNCIONES DE INTERACCIÓN Y REGISTRO
+ */
+
+/**
+ * Reproduce un archivo de audio y registra el uso
+ * @param {string} audioFile - Nombre del archivo de audio
+ * @param {number} flashcardId - ID de la flashcard
+ */
+function playAudio(audioFile, flashcardId) {
+    const audio = new Audio(`/audios/${audioFile}`);
+    audio.play();
+
+    // Si se proporciona ID, registrar el uso
+    if (flashcardId) {
+        registrarUsoFlashCard(flashcardId);
+    }
+}
+
+/**
+ * Registra el uso de una flashcard en la API
+ * @param {number} id - ID de la flashcard
+ */
 function registrarUsoFlashCard(id) {
     fetch(`${API_BASE_URL}/flashcards/${id}/registrar-uso`, {
         method: 'POST'
@@ -259,81 +346,26 @@ function registrarUsoFlashCard(id) {
         .catch(error => console.error('Error:', error));
 }
 
-// Función para volver a la vista de categorías
-function showCategories() {
-    document.getElementById("flashcards").style.display = "none";
-    document.getElementById("categories").style.display = "block";
-}
+/**
+ * FUNCIONES PARA GESTIÓN DE TEMA OSCURO/CLARO
+ */
 
-// Reproduce un archivo de audio y registra el uso
-function playAudio(audioFile, flashcardId) {
-    const audio = new Audio(`/audios/${audioFile}`);
-    audio.play();
-
-    // Si se proporciona ID, registrar el uso
-    if (flashcardId) {
-        registrarUsoFlashCard(flashcardId);
-    }
-}
-// Función para alternar entre modo claro y oscuro
+/**
+ * Alterna entre modo claro y oscuro
+ */
 function toggleModoOscuro() {
     document.body.classList.toggle('dark-mode');
     const modoActual = document.body.classList.contains('dark-mode') ? 'oscuro' : 'claro';
     localStorage.setItem('modoPreferido', modoActual);
 
-    // Actualizar el icono del botón
-    const modeIcon = document.querySelector('.mode-toggle-icon');
-    if (modeIcon) {
-        modeIcon.className = document.body.classList.contains('dark-mode') ?
-            'bi bi-sun mode-toggle-icon' : 'bi bi-moon mode-toggle-icon';
-    }
+    // Actualizar el icono
+    actualizarIconoModoOscuro(document.body.classList.contains('dark-mode'));
 }
 
-// Cargar preferencia guardada cuando se inicia la aplicación
-function cargarModoPreferido() {
-    const modoGuardado = localStorage.getItem('modoPreferido');
-    if (modoGuardado === 'oscuro') {
-        document.body.classList.add('dark-mode');
-
-        // Actualizar el icono si existe
-        const modeIcon = document.querySelector('.mode-toggle-icon');
-        if (modeIcon) {
-            modeIcon.className = 'bi bi-sun mode-toggle-icon';
-        }
-    }
-}
-
-// Agregar el botón de alternar modo a la barra de navegación
-function agregarBotonModoOscuro() {
-    const navbarNav = document.querySelector('.navbar-nav');
-    if (navbarNav) {
-        // Crear elemento para el botón
-        const modeToggleItem = document.createElement('li');
-        modeToggleItem.className = 'nav-item';
-        modeToggleItem.id = 'mode-toggle';
-
-        // Determinar el icono inicial según el modo actual
-        const iconClass = document.body.classList.contains('dark-mode') ?
-            'bi bi-sun mode-toggle-icon' : 'bi bi-moon mode-toggle-icon';
-
-        modeToggleItem.innerHTML = `
-            <a class="nav-link" href="#" aria-label="Cambiar modo oscuro/claro">
-                <i class="${iconClass}"></i>
-            </a>
-        `;
-
-        // Agregar evento al botón
-        modeToggleItem.addEventListener('click', (e) => {
-            e.preventDefault();
-            toggleModoOscuro();
-        });
-
-        // Insertar al final de la barra de navegación
-        navbarNav.appendChild(modeToggleItem);
-    }
-}
-
-// Agregar a app.js - Detección de preferencia del sistema
+/**
+ * Detecta la preferencia de color del sistema
+ * @returns {string} - 'oscuro' o 'claro' según la preferencia del sistema
+ */
 function detectarPreferenciaDelSistema() {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         return 'oscuro';
@@ -341,7 +373,9 @@ function detectarPreferenciaDelSistema() {
     return 'claro';
 }
 
-// Mejorar la función de carga del modo preferido
+/**
+ * Carga la preferencia de tema guardada o utiliza la del sistema
+ */
 function cargarModoPreferido() {
     let modoGuardado = localStorage.getItem('modoPreferido');
 
@@ -357,11 +391,46 @@ function cargarModoPreferido() {
     }
 }
 
-// Función para actualizar el icono según el modo
+/**
+ * Actualiza el icono según el modo actual
+ * @param {boolean} esModoOscuro - Indica si está activo el modo oscuro
+ */
 function actualizarIconoModoOscuro(esModoOscuro) {
     const modeIcon = document.querySelector('.mode-toggle-icon');
     if (modeIcon) {
         modeIcon.className = esModoOscuro ?
             'bi bi-sun mode-toggle-icon' : 'bi bi-moon mode-toggle-icon';
     }
+}
+
+/**
+ * Agrega el botón de modo oscuro a la barra de navegación
+ */
+function agregarBotonModoOscuro() {
+    const navbarNav = document.querySelector('.navbar-nav');
+    if (!navbarNav) return;
+
+    // Crear elemento para el botón
+    const modeToggleItem = document.createElement('li');
+    modeToggleItem.className = 'nav-item';
+    modeToggleItem.id = 'mode-toggle';
+
+    // Determinar el icono inicial según el modo actual
+    const iconClass = document.body.classList.contains('dark-mode') ?
+        'bi bi-sun mode-toggle-icon' : 'bi bi-moon mode-toggle-icon';
+
+    modeToggleItem.innerHTML = `
+        <a class="nav-link" href="#" aria-label="Cambiar modo oscuro/claro">
+            <i class="${iconClass}"></i>
+        </a>
+    `;
+
+    // Agregar evento al botón
+    modeToggleItem.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleModoOscuro();
+    });
+
+    // Insertar al final de la barra de navegación
+    navbarNav.appendChild(modeToggleItem);
 }
