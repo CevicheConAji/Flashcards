@@ -4,150 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ffffff" id="theme-color">
+    <meta name="description" content="Aplicación web para aprendizaje mediante flashcards">
     <title>WebApp de Flash Cards</title>
     <link rel="icon" href="/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-        .navbar {
-            background-color: #1a73e8;
-        }
-        .navbar-brand, .navbar-nav .nav-link {
-            color: #fff !important;
-            font-weight: 500;
-        }
-        .navbar-brand:hover, .navbar-nav .nav-link:hover {
-            color: #dce4f7 !important;
-        }
-        .section-title {
-            border-bottom: 3px solid #1a73e8;
-            padding-bottom: 0.5rem;
-            margin-bottom: 2rem;
-            font-weight: 500;
-            color: #1a73e8;
-        }
-        .category-button {
-            font-size: 1.5rem !important; /* Aumenta el tamaño del texto */
-            padding: 1.5rem 2rem !important; /* Aumenta el área de clic */
-            border-radius: 12px !important; /* Bordes redondeados */
-            outline: none !important; /* Elimina el borde predeterminado */
-            transition: transform 0.2s ease, background-color 0.2s ease !important;
-        }
-        .category-button:focus {
-            outline: 3px solid #1a73e8; /* Enfoque visible */
-            outline-offset: 2px;
-        }
-        .category-button:hover {
-            transform: scale(1.05); /* Efecto de zoom */
-            background-color: #dce4f7; /* Cambio de color */
-        }
-        .flashcard {
-            max-width: 100%; /* Asegura que no exceda el ancho del contenedor */
-            width: 300px; /* Ancho predeterminado */
-            height: 400px;
-            margin: 10px auto; /* Centra horizontalmente */
-            padding: 20px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .flashcard:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        .flashcard img {
-            width: 100%; /* Ocupa todo el ancho */
-            height: 100%; /* Ocupa toda la altura */
-            object-fit: cover; /* Ajusta la imagen sin distorsionarla */
-        }
-        footer {
-            background-color: #1a73e8;
-            color: #fff;
-            padding: 1rem 0;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-        footer a {
-            color: #dce4f7;
-            text-decoration: none;
-        }
-        footer a:hover {
-            text-decoration: underline;
-        }
-        /* Añadir en la sección <style> en index.html o crear un archivo dark-mode.css */
-        .dark-mode {
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-
-        .dark-mode .navbar {
-            background-color: #1e1e1e !important;
-            border-bottom: 1px solid #333;
-        }
-
-        .dark-mode .card {
-            background-color: #2d2d2d;
-            border-color: #444;
-            color: #e0e0e0;
-        }
-
-        .dark-mode .section-title {
-            color: #90caf9;
-            border-bottom-color: #444;
-        }
-
-        .dark-mode .popular-flashcard,
-        .dark-mode .flashcard {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
-        }
-
-        .dark-mode .btn-outline-primary {
-            color: #90caf9;
-            border-color: #90caf9;
-        }
-
-        .dark-mode .btn-outline-primary:hover {
-            background-color: #1a3f60;
-            color: #fff;
-        }
-
-        .dark-mode .btn-primary {
-            background-color: #1976d2;
-            border-color: #1565c0;
-        }
-
-        .dark-mode footer {
-            background-color: #1e1e1e;
-            border-top: 1px solid #333;
-            color: #aaa;
-        }
-
-        .dark-mode .alert-success {
-            background-color: #1b5e20;
-            color: #e0e0e0;
-            border-color: #388e3c;
-        }
-
-        .dark-mode .modal-content {
-            background-color: #2d2d2d;
-            color: #e0e0e0;
-            border-color: #444;
-        }
-
-        .mode-toggle-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .dark-mode .mode-toggle-icon {
-            transform: rotate(180deg);
-        }
-    </style>
+    <link href="/css/styles.css" rel="stylesheet">
 </head>
 <body>
 <!-- Barra de navegación -->
@@ -162,14 +25,16 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="/">Inicio</a>
                 </li>
-                <li>
+                <!-- Elementos solo para usuarios no autenticados -->
+                <li class="nav-item" id="login-item">
                     <a class="nav-link" href="/login.html">Login</a>
                 </li>
-                <li>
+                <li class="nav-item" id="register-item">
                     <a class="nav-link" href="/registry.html">Registro</a>
                 </li>
-                <li id="logout-item" style="display: none;">
-                    <a class="nav-link" href="#" onclick="logout()">Cerrar sesión</a>
+                <!-- Elemento solo para usuarios autenticados -->
+                <li class="nav-item d-none" id="logout-item">
+                    <a class="nav-link" href="#" id="logout-link">Cerrar sesión</a>
                 </li>
             </ul>
             <div id="auth-links">
@@ -182,6 +47,7 @@
 <div class="container py-5">
     <h1 class="text-center mb-5 text-primary">WebApp de Flash Cards</h1>
 
+    <!-- Sección de categorías -->
     <div id="categories" class="mb-5">
         <h3 class="section-title text-center">Categorías</h3>
         <div class="d-flex flex-wrap gap-3 justify-content-center" id="category-buttons" role="list">
@@ -189,6 +55,7 @@
         </div>
     </div>
 
+    <!-- Sección de flashcards -->
     <div id="flashcards" style="display: none;">
         <h3 id="category-name" class="section-title text-center mb-4"></h3>
         <div class="text-center mb-4">
@@ -203,31 +70,29 @@
             </button>
         </div>
     </div>
-</div>
-<section class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Flashcards más populares</h2>
-        <button id="btn-actualizar-populares" class="btn btn-primary">
-            <i class="bi bi-arrow-clockwise"></i> Actualizar
-        </button>
-    </div>
-    <div id="most-used-flashcards" class="mt-4">
-        <!-- Aquí se cargarán dinámicamente las flashcards más usadas -->
-        <div class="d-flex justify-content-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
+
+    <!-- Sección de flashcards más populares -->
+    <section class="my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Flashcards más populares</h2>
+            <button id="btn-actualizar-populares" class="btn btn-primary">
+                <i class="bi bi-arrow-clockwise"></i> Actualizar
+            </button>
+        </div>
+        <div id="most-used-flashcards" class="mt-4">
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
             </div>
         </div>
-    </div>
-</section>
-
+    </section>
+</div>
 
 <!-- Pie de página -->
 <footer>
     <div class="container py-4">
         <div class="row text-center text-md-start">
-
-            <!-- Enlaces a redes sociales -->
             <div class="col-md-3 mb-3">
                 <h5>Síguenos</h5>
                 <div>
@@ -237,7 +102,6 @@
                 </div>
             </div>
 
-            <!-- Avisos legales -->
             <div class="col-md-3 mb-3">
                 <h5>Legal</h5>
                 <ul class="list-unstyled">
@@ -247,7 +111,6 @@
                 </ul>
             </div>
 
-            <!-- Datos de contacto -->
             <div class="col-md-3 mb-3">
                 <h5>Contacto</h5>
                 <p>Email: zavalachirapiero@gmail.com</p>
@@ -255,20 +118,19 @@
                 <p>Dirección: Calle Musico Andreu 14, Valencia, España</p>
             </div>
 
-            <!-- Marca registrada -->
             <div class="col-md-3 mb-3">
                 <h5>Marca Registrada</h5>
                 <p>&copy; 2025 Flash Cards. Todos los derechos reservados.</p>
             </div>
-
         </div>
     </div>
 </footer>
+
 <script src="js/config.js"></script>
 <script src="js/app.js"></script>
 <script src="js/auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- actualizar el color del tema según el modo -->
+
 <script>
     function actualizarThemeColor() {
         const metaThemeColor = document.getElementById('theme-color');
@@ -279,18 +141,83 @@
         }
     }
 
-    // Observar cambios en el classList del body
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.attributeName === "class") {
-                actualizarThemeColor();
-            }
-        });
-    });
+    // Verificar si el usuario está autenticado y mostrar/ocultar elementos correspondientes
+    function updateAuthUI() {
+        const token = localStorage.getItem('token');
+        const loginItem = document.getElementById('login-item');
+        const registerItem = document.getElementById('register-item');
+        const logoutItem = document.getElementById('logout-item');
+
+        if (token) {
+            // Usuario autenticado
+            if (loginItem) loginItem.classList.add('d-none');
+            if (registerItem) registerItem.classList.add('d-none');
+            if (logoutItem) logoutItem.classList.remove('d-none');
+        } else {
+            // Usuario no autenticado
+            if (loginItem) loginItem.classList.remove('d-none');
+            if (registerItem) registerItem.classList.remove('d-none');
+            if (logoutItem) logoutItem.classList.add('d-none');
+        }
+    }
+
+    // Función para cerrar sesión
+    function logout() {
+        // Quitar datos de sesión
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+
+        // Forzar una recarga completa sin caché
+        window.location.href = '/?nocache=' + new Date().getTime();
+
+        // Prevenir que la función continúe ejecutándose
+        return false;
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
+        // Observer para tema oscuro
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === "class") {
+                    actualizarThemeColor();
+                }
+            });
+        });
         observer.observe(document.body, { attributes: true });
         actualizarThemeColor();
+
+        // Configurar botón de cierre de sesión
+        const logoutLink = document.getElementById('logout-link');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Limpiar localStorage
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                localStorage.removeItem('username');
+
+                // Redirigir usando técnica anti-caché
+                window.location.href = '/?t=' + Date.now();
+            });
+        }
+
+        // Actualizar UI según estado de autenticación al cargar la página
+        const token = localStorage.getItem('token');
+        const loginItem = document.getElementById('login-item');
+        const registerItem = document.getElementById('register-item');
+        const logoutItem = document.getElementById('logout-item');
+
+        if (token) {
+            // Usuario autenticado
+            if (loginItem) loginItem.classList.add('d-none');
+            if (registerItem) registerItem.classList.add('d-none');
+            if (logoutItem) logoutItem.classList.remove('d-none');
+        } else {
+            // Usuario no autenticado
+            if (loginItem) loginItem.classList.remove('d-none');
+            if (registerItem) registerItem.classList.remove('d-none');
+            if (logoutItem) logoutItem.classList.add('d-none');
+        }
     });
 </script>
 </body>
