@@ -270,24 +270,63 @@ function toggleBotonCarga(button, isLoading, originalText = null) {
  * @param {string} parametro - Parámetro URL a eliminar
  */
 function mostrarAlerta(mensaje, tipo, parametro) {
+    // Crear el contenedor de la alerta con estilos mejorados
+    const alertContainer = document.createElement('div');
+    alertContainer.style.position = 'fixed';
+    alertContainer.style.top = '80px'; // Debajo de la barra de navegación
+    alertContainer.style.left = '50%';
+    alertContainer.style.transform = 'translateX(-50%)';
+    alertContainer.style.zIndex = '1050';
+    alertContainer.style.width = '80%';
+    alertContainer.style.maxWidth = '500px';
+
+    // Crear la alerta
     const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${tipo} mb-4`;
+    alertDiv.className = `alert alert-${tipo} shadow-lg`;
     alertDiv.role = 'alert';
-    alertDiv.textContent = mensaje;
+    alertDiv.style.textAlign = 'center';
 
-    const container = document.querySelector('.container');
-    if (container && container.firstChild) {
-        container.insertBefore(alertDiv, container.firstChild);
-
-        // Eliminar el mensaje después de 5 segundos
-        setTimeout(() => {
-            alertDiv.remove();
-            // Limpiar el parámetro de la URL
-            const url = new URL(window.location.href);
-            url.searchParams.delete(parametro);
-            window.history.replaceState({}, document.title, url);
-        }, 5000);
+    // Añadir icono según el tipo de alerta
+    let icon = '';
+    if (tipo === 'success') {
+        icon = '<i class="bi bi-check-circle-fill me-2"></i>';
+    } else if (tipo === 'warning') {
+        icon = '<i class="bi bi-exclamation-triangle-fill me-2"></i>';
+    } else if (tipo === 'danger') {
+        icon = '<i class="bi bi-x-circle-fill me-2"></i>';
     }
+
+    // Añadir contenido HTML a la alerta
+    alertDiv.innerHTML = `${icon}${mensaje}`;
+
+    // Añadir la alerta al contenedor
+    alertContainer.appendChild(alertDiv);
+
+    // Añadir el contenedor al body
+    document.body.appendChild(alertContainer);
+
+    // Añadir animación de entrada
+    alertContainer.style.opacity = '0';
+    alertContainer.style.transition = 'opacity 0.3s ease-in-out';
+
+    setTimeout(() => {
+        alertContainer.style.opacity = '1';
+    }, 10);
+
+    // Eliminar el mensaje después de 5 segundos con animación de salida
+    setTimeout(() => {
+        alertContainer.style.opacity = '0';
+
+        // Eliminar el elemento después de completar la animación
+        setTimeout(() => {
+            alertContainer.remove();
+        }, 300);
+
+        // Limpiar el parámetro de la URL
+        const url = new URL(window.location.href);
+        url.searchParams.delete(parametro);
+        window.history.replaceState({}, document.title, url);
+    }, 5000);
 }
 
 /**
