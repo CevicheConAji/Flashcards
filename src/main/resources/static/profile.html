@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="#ffffff" id="theme-color" name="theme-color">
+    <meta content="Perfil de usuario de Flashcards" name="description">
+    <title>Mi Perfil - Flashcards</title>
+    <link href="/favicon.ico" rel="icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+<!-- Barra de navegación -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Flashcards</a>
+        <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Inicio</a>
+                </li>
+                <li class="nav-item" id="login-item">
+                    <a class="nav-link" href="/login.html">Login</a>
+                </li>
+                <li class="nav-item" id="register-item">
+                    <a class="nav-link" href="/registry.html">Registro</a>
+                </li>
+                <li class="nav-item" id="profile-item">
+                    <a class="nav-link active" href="/profile.html">Mi perfil</a>
+                </li>
+                <li class="nav-item" id="logout-item">
+                    <a class="nav-link" href="#" id="logout-link">Cerrar sesión</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenedor principal -->
+<main class="container py-5">
+    <h1 class="text-center mb-5 text-primary">Mi Perfil</h1>
+
+    <!-- Información del usuario -->
+    <section class="card mb-5 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h4 mb-0">Información Personal</h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger d-none" id="error-message"></div>
+            <div class="alert alert-success d-none" id="success-message"></div>
+
+            <form id="profile-form">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="username">Usuario</label>
+                        <input class="form-control" id="username" name="username" readonly type="text">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="email">Email</label>
+                        <input class="form-control" id="email" name="email" type="email">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <h5>Cambiar contraseña</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="current-password">Contraseña actual</label>
+                            <input class="form-control" id="current-password" name="current-password" type="password">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="new-password">Nueva contraseña</label>
+                            <input class="form-control" id="new-password" name="new-password" type="password">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="confirm-password">Confirmar contraseña</label>
+                            <input class="form-control" id="confirm-password" name="confirm-password" type="password">
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary" type="submit">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Flashcards personalizadas para el usuario -->
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Mis flashcards más utilizadas</h2>
+            <button class="btn btn-primary" id="btn-actualizar-personalizadas">
+                <i class="bi bi-arrow-clockwise"></i> Actualizar
+            </button>
+        </div>
+        <div class="row" id="personal-flashcards">
+            <!-- Se cargará dinámicamente -->
+            <div class="d-flex justify-content-center w-100">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Preferencias de la aplicación -->
+    <section class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h4 mb-0">Preferencias</h2>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label d-flex justify-content-between">
+                    <span>Modo oscuro</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" id="darkModeSwitch" type="checkbox">
+                    </div>
+                </label>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Pie de página -->
+<footer>
+    <div class="container py-4">
+        <div class="row text-center text-md-start">
+            <div class="col-md-3 mb-3">
+                <h5>Síguenos</h5>
+                <div>
+                    <a class="text-white me-2" href="https://facebook.com" target="_blank"><i
+                            class="bi bi-facebook"></i></a>
+                    <a class="text-white me-2" href="https://twitter.com" target="_blank"><i class="bi bi-twitter"></i></a>
+                    <a class="text-white" href="https://instagram.com" target="_blank"><i
+                            class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <h5>Legal</h5>
+                <ul class="list-unstyled">
+                    <li><a class="text-white" href="/aviso-legal.html">Aviso Legal</a></li>
+                    <li><a class="text-white" href="/politica-privacidad.html">Política de Privacidad</a></li>
+                    <li><a class="text-white" href="/politica-cookies.html">Política de Cookies</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 mb-3">
+                <h5>Contacto</h5>
+                <p>Email: zavalachirapiero@gmail.com</p>
+                <p>Teléfono: +34 747 421 185</p>
+                <p>Dirección: Calle Musico Andreu 14, Valencia, España</p>
+            </div>
+            <div class="col-md-3 mb-3">
+                <h5>Marca Registrada</h5>
+                <p>&copy; 2025 Flash Cards. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/profile.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function actualizarThemeColor() {
+        const metaThemeColor = document.getElementById('theme-color');
+        if (document.body.classList.contains('dark-mode')) {
+            metaThemeColor.setAttribute("content", "#121212");
+        } else {
+            metaThemeColor.setAttribute("content", "#ffffff");
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // … tu lógica de theme …
+
+        // Verificar autenticación – redirigir si no hay token
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('username');
+        if (!token || !user) {
+            // Construimos la URL actual (ruta + query)
+            const currentPath = window.location.pathname + window.location.search;
+            const redirectParam = encodeURIComponent(currentPath);
+            console.log('👉 Redirigiendo a login con redirect=', redirectParam);
+            window.location.href = `/login.html?redirect=${redirectParam}`;
+            return;
+        }
+    });
+</script>
+</body>
+</html>

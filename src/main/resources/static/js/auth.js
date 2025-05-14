@@ -16,7 +16,7 @@ if (typeof window.API_BASE_URL === 'undefined') {
  */
 function verificarAutenticacion() {
     const token = localStorage.getItem('token');
-    const username = localStorage.getItem('usuario');
+    const username = localStorage.getItem('username');
 
     // Actualizar la interfaz según el estado de autenticación
     actualizarInterfazUsuario(!!username, username);
@@ -97,7 +97,7 @@ function logout() {
  */
 function finalizarSesion() {
     localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
+    localStorage.removeItem('username');
     window.location.href = '/';
 }
 
@@ -127,51 +127,54 @@ function inicializarFormularios() {
 
 /**
  * Maneja el envío del formulario de login
- * @param {Event} e - Evento del formulario
+ * @param {Event} e
  */
 function manejarFormularioLogin(e) {
     e.preventDefault();
+    // 1) Leer redirect de la URL (o / si no viene)
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirect = urlParams.get('redirect') || '/';
+    console.log('👉 Login form submitted, redirect param:', redirect);
 
+    // 2) Datos de login
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const submitButton = document.querySelector('#login-form button[type="submit"]');
-
-    // Mostrar indicador de carga
     const originalText = submitButton.innerHTML;
+
+    // 3) Mostrar loader
     toggleBotonCarga(submitButton, true);
 
-    // Limpiar mensajes de error previos
-    ocultarError();
-
+    // 4) Petición al API
     fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
     })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Credenciales inválidas');
-            }
+            if (!response.ok) throw new Error('Credenciales inválidas');
             return response.json();
         })
         .then(data => {
-            // Guardar información de sesión
-            localStorage.setItem('token', 'jwt-token-simulado');
-            localStorage.setItem('usuario', data.username);
+            // 5) Guardar token/usuario
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('username', username);
 
-            // Redirigir a la página principal
-            window.location.href = '/?loginExitoso=true';
+            // 6) Redirigir a donde nos pidieron
+            const sep = redirect.includes('?') ? '&' : '?';
+            const finalURL = `${redirect}${sep}loginExitoso=true`;
+            console.log('👉 Navegando a:', finalURL);
+            window.location.href = finalURL;
         })
-        .catch(error => {
-            console.error('Error:', error);
-            showError(error.message);
+        .catch(err => {
+            console.error('Error login:', err);
+            showError(err.message);
         })
         .finally(() => {
             toggleBotonCarga(submitButton, false, originalText);
         });
 }
+
 
 /**
  * Maneja el envío del formulario de registro
@@ -343,6 +346,27 @@ function verificarMensajesExito() {
     // Verificar login exitoso
     if (urlParams.get('loginExitoso') === 'true') {
         mostrarAlerta('¡Has iniciado sesión correctamente!', 'success', 'loginExitoso');
+    }
+}
+
+function actualizarNavegacion(autenticado) {
+    const loginItem = document.querySelector('.nav-link[href="/login.html"]').parentElement;
+    const registryItem = document.querySelector('.nav-link[href="/registry.html"]').parentElement;
+    const logoutItem = document.getElementById('logout-item');
+    const profileItem = document.getElementById('profile-item');
+
+    if (autenticado) {
+        // Si está autenticado: ocultar login y registro, mostrar cerrar sesión y perfil
+        loginItem.classList.add('d-none');
+        registryItem.classList.add('d-none');
+        logoutItem.classList.remove('d-none');
+        profileItem.classList.remove('d-none');
+    } else {
+        // Si no está autenticado: mostrar login y registro, ocultar cerrar sesión y perfil
+        loginItem.classList.remove('d-none');
+        registryItem.classList.remove('d-none');
+        logoutItem.classList.add('d-none');
+        profileItem.classList.add('d-none');
     }
 }
 

@@ -14,15 +14,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    /**
-     * Configura los controladores de vistas.
-     * Redirige la ruta raíz ("/") hacia el archivo index.html.
-     *
-     * @param registry Registro de controladores de vistas
-     */
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("forward:/index.html");
+        registry.addViewController("/profile")
+                .setViewName("forward:/profile.html");
+    }
+
+    @Controller static class FallbackController {
+        @RequestMapping(value = "/**/{path:[^\\.]*}")
+        public String forward() {
+            return "forward:/index.html";
+        }
     }
 
     /**
@@ -41,17 +43,4 @@ public class WebConfig implements WebMvcConfigurer {
      * Controlador para gestionar las rutas no encontradas en el backend.
      * Permite el correcto funcionamiento del enrutamiento de SPA (Single Page Application).
      */
-    @Controller
-    static class FallbackController {
-        /**
-         * Redirige todas las rutas que no contienen extensión al index.html.
-         * Esto permite que las rutas del frontend sean manejadas por el router del cliente.
-         *
-         * @return Redirección hacia index.html
-         */
-        @RequestMapping(value = "/**/{path:[^\\.]*}")
-        public String forward() {
-            return "forward:/index.html";
-        }
-    }
 }
