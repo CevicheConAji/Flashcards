@@ -2,24 +2,25 @@
  * Funcionalidad para la página de perfil de usuario
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // Comprobación inicial de autenticación
-    const token = localStorage.getItem('token');
+    // 1) comprueba token/username…
+    const token    = localStorage.getItem('token');
     const username = localStorage.getItem('username');
-
     if (!token || !username) {
         window.location.href = '/login.html?redirect=profile';
         return;
     }
 
-    // Inicializar la interfaz
+    // 2) inicializa UI (pone el username en el input, dark-mode…)
     setupUserInterface();
 
-    // Configurar eventos
-    setupEventListeners();
-
-    // Cargar datos de usuario y flashcards
+    // 3) **carga YA los datos de perfil**
     loadUserData();
+
+    // 4) **carga YA las flashcards más usadas**
     loadPersonalizedFlashcards();
+
+    // 5) configura los event listeners
+    setupEventListeners();
 });
 
 /**
@@ -107,10 +108,20 @@ function handleProfileUpdate(event) {
  */
 function loadUserData() {
     const username = localStorage.getItem('username');
-
-    // Simulamos datos cargados (aquí se implementaría la llamada API real)
-    document.getElementById('username').value = username;
-    document.getElementById('email').value = `${username}@example.com`;
+    // Usa tu API_BASE_URL para no hardcodear “/api”
+    fetch(`${window.API_BASE_URL}/auth/usuarios/${username}`)
+        .then(resp => {
+            if (!resp.ok) throw new Error('No se pudo cargar perfil');
+            return resp.json();
+        })
+        .then(data => {
+            document.getElementById('username').value = data.username;
+            document.getElementById('email').value    = data.email;
+        })
+        .catch(err => {
+            console.error('Error al cargar perfil:', err);
+            alert('No se pudieron cargar los datos de tu perfil');
+        });
 }
 
 /**
