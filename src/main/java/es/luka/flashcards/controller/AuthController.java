@@ -100,7 +100,7 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
-    // Agregar este método al AuthController o crear un nuevo UserController
+    // Agregar este métod o al AuthController o crear un nuevo UserController
     @GetMapping("/usuarios/{username}")
     public ResponseEntity<?> obtenerDatosUsuario(@PathVariable String username) {
         return usuarioService.buscarPorUsername(username)

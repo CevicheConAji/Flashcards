@@ -27,17 +27,18 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/">Inicio</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="login-item">
                     <a class="nav-link" href="/login.html">Login</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="register-item">
                     <a class="nav-link" href="/registry.html">Registro</a>
                 </li>
-                <!-- Item para logout (oculto por defecto, se muestra con auth.js) -->
-                <li class="nav-item" id="logout-item" style="display: none;">
-                    <a class="nav-link" href="#" onclick="logout(); return false;">Cerrar sesión</a>
+                <li class="nav-item d-none" id="profile-item">
+                    <a class="nav-link" href="/profile.html">Mi perfil</a>
                 </li>
-                <!-- El botón de modo oscuro se insertará aquí mediante JavaScript -->
+                <li class="nav-item d-none" id="logout-item">
+                    <a class="nav-link" href="#" id="logout-link">Cerrar sesión</a>
+                </li>
             </ul>
         </div>
     </div>
@@ -133,6 +134,18 @@
 <script src="js/app.js"></script>
 <script src="js/auth.js"></script>
 <script>
+    function updateAuthUI() {
+        const token = localStorage.getItem('token');
+        const loginItem    = document.getElementById('login-item');
+        const registerItem = document.getElementById('register-item');
+        const profileItem  = document.getElementById('profile-item');
+        const logoutItem   = document.getElementById('logout-item');
+
+        if (loginItem)    loginItem.classList.toggle('d-none', !!token);
+        if (registerItem) registerItem.classList.toggle('d-none', !!token);
+        if (profileItem)  profileItem.classList.toggle('d-none', !token);
+        if (logoutItem)   logoutItem.classList.toggle('d-none', !token);
+    }
     // Actualiza el color del tema en la etiqueta meta cuando cambia el modo oscuro/claro
     function actualizarThemeColor() {
         const metaThemeColor = document.getElementById('theme-color');
@@ -141,6 +154,13 @@
         } else {
             metaThemeColor.setAttribute("content", "#ffffff");
         }
+    }
+    function logout(e) {
+        e.preventDefault();
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        updateAuthUI();
+        window.location.href = '/';
     }
 
     // Observer para detectar cambios en la clase del body (cambio de tema)
@@ -154,6 +174,9 @@
 
     // Inicialización cuando el DOM está cargado
     document.addEventListener('DOMContentLoaded', () => {
+        updateAuthUI();
+        const logoutLink = document.getElementById('logout-link');
+        if (logoutLink) logoutLink.addEventListener('click', logout);
         observer.observe(document.body, { attributes: true });
         actualizarThemeColor();
     });
