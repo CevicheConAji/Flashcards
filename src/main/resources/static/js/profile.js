@@ -124,12 +124,17 @@ function loadUserData() {
         });
 }
 
+
 /**
- * Carga las flashcards personalizadas del usuario
+ * Carga las flashcards más usadas del usuario actual
  */
+// Mejora en la función loadPersonalizedFlashcards
 function loadPersonalizedFlashcards() {
     const username = localStorage.getItem('username');
     const container = document.getElementById('personal-flashcards');
+    const apiUrl = `${window.API_BASE_URL}/usuarios/${username}/flashcards/mas-usadas`;
+
+    console.log('⏳ Cargando flashcards más usadas desde:', apiUrl);
 
     // Mostrar spinner mientras carga
     container.innerHTML = `
@@ -140,29 +145,48 @@ function loadPersonalizedFlashcards() {
         </div>
     `;
 
-    // Realizar petición al endpoint personalizado
-    fetch(`/api/flashcards/personalizadas/${username}`)
+    // Realizar petición a la API
+    fetch(apiUrl)
         .then(response => {
+            console.log('📊 Estado de respuesta:', response.status);
             if (!response.ok) {
-                throw new Error('Error al cargar flashcards personalizadas');
+                throw new Error(`Error de servidor: ${response.status}`);
             }
             return response.json();
         })
         .then(flashcards => {
+            console.log('📦 Datos recibidos:', flashcards);
             displayPersonalizedFlashcards(flashcards);
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('❌ Error al cargar flashcards:', error);
             container.innerHTML = `
                 <div class="alert alert-danger w-100" role="alert">
-                    Error al cargar las flashcards. Intente nuevamente.
+                    Error al cargar las flashcards: ${error.message}. Intente nuevamente.
                 </div>
             `;
         });
 }
 
+// Función para probar con datos estáticos (añade esto a tu código)
+function testWithStaticData() {
+    const flashcards = [
+        { id: 1, texto: "Perro", rutaImagen: "perro.jpg", contadorUso: 5 },
+        { id: 2, texto: "Gato", rutaImagen: "gato.jpg", contadorUso: 3 }
+    ];
+    console.log('🧪 Probando con datos estáticos');
+    displayPersonalizedFlashcards(flashcards);
+}
+
+// Añade un botón para probar con datos estáticos
+document.getElementById('btn-actualizar-personalizadas').insertAdjacentHTML(
+    'afterend',
+    '<button class="btn btn-warning ms-2" id="btn-test-static">Probar con datos fijos</button>'
+);
+document.getElementById('btn-test-static').addEventListener('click', testWithStaticData);
+
 /**
- * Muestra las flashcards personalizadas en la UI
+ * Muestra las flashcards más usadas en la UI
  * @param {Array} flashcards - Lista de flashcards a mostrar
  */
 function displayPersonalizedFlashcards(flashcards) {
@@ -171,60 +195,88 @@ function displayPersonalizedFlashcards(flashcards) {
     if (!flashcards || flashcards.length === 0) {
         container.innerHTML = `
             <div class="alert alert-info w-100" role="alert">
-                Aún no hay flashcards personalizadas para mostrar. ¡Usa más flashcards para verlas aquí!
+                Aún no has usado flashcards. ¡Comienza a practicar para ver tus flashcards más usadas aquí!
             </div>
         `;
         return;
     }
 
-    // Construir HTML para cada flashcard
-    let html = '';
+    // Crear estructura de filas similar a la página principal
+    const row = document.createElement("div");
+    row.className = "row";
+
     flashcards.forEach(card => {
-        html += `
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">${card.categoria ? card.categoria.nombre : 'Sin categoría'}</h5>
-                        <p class="card-text">${card.texto}</p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="badge bg-primary">Usos: ${card.contadorUso}</span>
-                            <button class="btn btn-sm btn-outline-primary" 
-                                onclick="registrarUso(${card.id})">
-                                Usar flashcard
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+        const col = document.createElement("div");
+        col.className = "col-md-3 mb-3";
+
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "card text-center shadow-sm popular-flashcard";
+        cardDiv.onclick = () => {
+            // Solo registrar el uso, sin reproducir audio
+            registrarUsoFlashCard(card.id);
+        };
+
+        const img = document.createElement("img");
+        img.src = `/images/${card.rutaImagen}`;
+        img.className = "card-img-top img-fluid";
+        img.alt = card.texto;
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        const title = document.createElement("h6");
+        title.className = "card-title";
+        title.textContent = card.texto;
+
+        const badge = document.createElement("span");
+        badge.className = "badge bg-info";
+        badge.textContent = `${card.contadorUso} usos`;
+
+        body.appendChild(title);
+        body.appendChild(badge);
+        cardDiv.appendChild(img);
+        cardDiv.appendChild(body);
+        col.appendChild(cardDiv);
+        row.appendChild(col);
     });
 
-    container.innerHTML = html;
+    container.innerHTML = "";
+    container.appendChild(row);
 }
 
 /**
- * Registra el uso de una flashcard
+ * Reproduce un archivo de audio y registra el uso
+ * @param {string} audioFile - Nombre del archivo de audio
+ * @param {number} flashcardId - ID de la flashcard
+ */
+function playAudio(audioFile, flashcardId) {
+    const audio = new Audio(`/audios/${audioFile}`);
+    audio.play();
+
+    // Si se proporciona ID, registrar el uso
+    if (flashcardId) {
+        registrarUsoFlashCard(flashcardId);
+    }
+}
+
+/**
+ * Registra el uso de una flashcard en la API
  * @param {number} id - ID de la flashcard
  */
-function registrarUso(id) {
-    fetch(`/api/flashcards/${id}/registrar-uso`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+function registrarUsoFlashCard(id) {
+    const username = localStorage.getItem('username');
+
+    fetch(`${window.API_BASE_URL}/usuarios/${username}/flashcards/${id}/usar`, {
+        method: 'POST'
     })
         .then(response => {
-            if (!response.ok) throw new Error('Error al registrar uso');
-            return response.json();
-        })
-        .then(data => {
+            if (!response.ok) {
+                throw new Error('Error al registrar uso');
+            }
             // Recargar las flashcards para mostrar el contador actualizado
             loadPersonalizedFlashcards();
         })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al registrar el uso de la flashcard');
-        });
+        .catch(error => console.error('Error:', error));
 }
 
 /**

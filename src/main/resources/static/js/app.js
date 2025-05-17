@@ -331,19 +331,34 @@ function playAudio(audioFile, flashcardId) {
 }
 
 /**
- * Registra el uso de una flashcard en la API
+ * Registra el uso de una flashcard cuando el usuario interactúa con ella
  * @param {number} id - ID de la flashcard
  */
 function registrarUsoFlashCard(id) {
-    fetch(`${API_BASE_URL}/flashcards/${id}/registrar-uso`, {
-        method: 'POST'
+    // Solo registrar si el usuario está autenticado
+    const username = localStorage.getItem('username');
+    const token = localStorage.getItem('token');
+
+    if (!username || !token) {
+        console.log('Usuario no autenticado, no se registra el uso');
+        return;
+    }
+
+    console.log(`📝 Registrando uso de flashcard ${id} para usuario ${username}`);
+
+    fetch(`${window.API_BASE_URL}/usuarios/${username}/flashcards/${id}/usar`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Error al registrar uso');
+                throw new Error(`Error al registrar uso: ${response.status}`);
             }
+            console.log(`✅ Uso de flashcard ${id} registrado correctamente`);
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.error('❌ Error:', error));
 }
 
 /**
