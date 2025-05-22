@@ -33,8 +33,12 @@
                 <li class="nav-item" id="register-item">
                     <a class="nav-link" href="/registry.html">Registro</a>
                 </li>
+                <!-- Elementos solo para usuarios autenticados -->
                 <li class="nav-item d-none" id="profile-item">
-                    <a class="nav-link" href="/profile.html">Mi perfil</a>
+                    <a class="nav-link" href="/profile.html">
+                        <i class="bi bi-person"></i>
+                        <span id="username-display" class="ms-1"></span>
+                    </a>
                 </li>
                 <li class="nav-item d-none" id="logout-item">
                     <a class="nav-link" href="#" id="logout-link">Cerrar sesión</a>
@@ -136,15 +140,27 @@
 <script>
     function updateAuthUI() {
         const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
+
+        const usernameItem = document.getElementById('username-item');
+        if (usernameItem) usernameItem.classList.toggle('d-none', !token);
+
         const loginItem    = document.getElementById('login-item');
         const registerItem = document.getElementById('register-item');
         const profileItem  = document.getElementById('profile-item');
         const logoutItem   = document.getElementById('logout-item');
+        const usernameDisplay = document.getElementById('username-display');
 
         if (loginItem)    loginItem.classList.toggle('d-none', !!token);
         if (registerItem) registerItem.classList.toggle('d-none', !!token);
         if (profileItem)  profileItem.classList.toggle('d-none', !token);
         if (logoutItem)   logoutItem.classList.toggle('d-none', !token);
+
+
+        // Mostrar el nombre de usuario si está disponible
+        if (usernameDisplay && username) {
+            usernameDisplay.textContent = username;
+        }
     }
     // Actualiza el color del tema en la etiqueta meta cuando cambia el modo oscuro/claro
     function actualizarThemeColor() {

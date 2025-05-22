@@ -176,7 +176,7 @@ public class DataLoader implements CommandLineRunner {
                 "Cebra", "Cerdo", "Ciervo", "Cisne", "Cocodrilo", "Cucaracha", "Dinosaurio", "Elefante", "Escarabajo",
                 "Foca", "Gallina", "Gallo", "Gato", "Hipopótamo", "Hormiga", "Jirafa", "León", "Lobo", "Loro",
                 "Mariposa", "Mono", "Mosca", "Mosquito", "Oso", "Oveja", "Pájaro", "Pato", "Perro", "Pingüino",
-                "Pollito", "Ratón", "Tigre", "Toro", "Tortuga", "Vaca", "Zorro"
+                "Pollo", "Ratón", "Tigre", "Toro", "Tortuga", "Vaca", "Zorro"
         );
         return crearCategoriaConFlashCards(CATEGORIA_ANIMALES, nombresAnimales);
     }

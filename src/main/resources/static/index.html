@@ -34,7 +34,10 @@
                 </li>
                 <!-- Elementos solo para usuarios autenticados -->
                 <li class="nav-item d-none" id="profile-item">
-                    <a class="nav-link" href="/profile.html">Mi perfil</a>
+                    <a class="nav-link" href="/profile.html">
+                        <i class="bi bi-person"></i>
+                        <span id="username-display" class="ms-1"></span>
+                    </a>
                 </li>
                 <li class="nav-item d-none" id="logout-item">
                     <a class="nav-link" href="#" id="logout-link">Cerrar sesión</a>
@@ -73,23 +76,6 @@
             </button>
         </div>
     </div>
-
-    <!-- Sección de flashcards más populares -->
-    <section class="my-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Flashcards más populares</h2>
-            <button id="btn-actualizar-populares" class="btn btn-primary">
-                <i class="bi bi-arrow-clockwise"></i> Actualizar
-            </button>
-        </div>
-        <div id="most-used-flashcards" class="mt-4">
-            <div class="d-flex justify-content-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Cargando...</span>
-                </div>
-            </div>
-        </div>
-    </section>
 </div>
 
 <!-- Pie de página -->
@@ -148,17 +134,27 @@
 
     function updateAuthUI() {
         const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
         console.log('🔐 updateAuthUI token?', token);
+
+        const usernameItem = document.getElementById('username-item');
+        if (usernameItem) usernameItem.classList.toggle('d-none', !token);
 
         const loginItem    = document.getElementById('login-item');
         const registerItem = document.getElementById('register-item');
         const profileItem  = document.getElementById('profile-item');
         const logoutItem   = document.getElementById('logout-item');
+        const usernameDisplay = document.getElementById('username-display');
 
         if (loginItem)    loginItem.classList.toggle('d-none', !!token);
         if (registerItem) registerItem.classList.toggle('d-none', !!token);
         if (profileItem)  profileItem.classList.toggle('d-none', !token);
         if (logoutItem)   logoutItem.classList.toggle('d-none', !token);
+
+        // Mostrar el nombre de usuario si está disponible
+        if (usernameDisplay && username) {
+            usernameDisplay.textContent = username;
+        }
     }
 
     function logout(e) {
@@ -216,6 +212,12 @@
             // Redirigir a inicio o login
             window.location.href = '/';
         });
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('📄 DOM fully loaded — inicializando auth UI');
+        updateAuthUI();
+        const logoutLink = document.getElementById('logout-link');
+        if (logoutLink) logoutLink.addEventListener('click', logout);
     });
 </script>
 </body>

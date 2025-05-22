@@ -168,22 +168,7 @@ function loadPersonalizedFlashcards() {
         });
 }
 
-// Función para probar con datos estáticos (añade esto a tu código)
-function testWithStaticData() {
-    const flashcards = [
-        { id: 1, texto: "Perro", rutaImagen: "perro.jpg", contadorUso: 5 },
-        { id: 2, texto: "Gato", rutaImagen: "gato.jpg", contadorUso: 3 }
-    ];
-    console.log('🧪 Probando con datos estáticos');
-    displayPersonalizedFlashcards(flashcards);
-}
 
-// Añade un botón para probar con datos estáticos
-document.getElementById('btn-actualizar-personalizadas').insertAdjacentHTML(
-    'afterend',
-    '<button class="btn btn-warning ms-2" id="btn-test-static">Probar con datos fijos</button>'
-);
-document.getElementById('btn-test-static').addEventListener('click', testWithStaticData);
 
 /**
  * Muestra las flashcards más usadas en la UI
@@ -212,8 +197,14 @@ function displayPersonalizedFlashcards(flashcards) {
         const cardDiv = document.createElement("div");
         cardDiv.className = "card text-center shadow-sm popular-flashcard";
         cardDiv.onclick = () => {
-            // Solo registrar el uso, sin reproducir audio
-            registrarUsoFlashCard(card.id);
+            // Modificar esta línea para reproducir audio
+            if (card.rutaAudio) {
+                playAudio(card.rutaAudio, card.id);
+            } else {
+                // Si no hay ruta de audio, solo registrar uso
+                registrarUsoFlashCard(card.id);
+                console.warn(`Flashcard ${card.id} no tiene ruta de audio`);
+            }
         };
 
         const img = document.createElement("img");
@@ -238,6 +229,8 @@ function displayPersonalizedFlashcards(flashcards) {
         cardDiv.appendChild(body);
         col.appendChild(cardDiv);
         row.appendChild(col);
+
+
     });
 
     container.innerHTML = "";
@@ -250,8 +243,14 @@ function displayPersonalizedFlashcards(flashcards) {
  * @param {number} flashcardId - ID de la flashcard
  */
 function playAudio(audioFile, flashcardId) {
-    const audio = new Audio(`/audios/${audioFile}`);
-    audio.play();
+    console.log(`Reproduciendo audio: /audio/${audioFile}`);
+    const audio = new Audio(`/audio/${audioFile}`);
+
+    audio.play()
+        .catch(error => {
+            console.error("Error al reproducir audio:", error);
+            alert("No se pudo reproducir el audio. Intente hacer clic nuevamente.");
+        });
 
     // Si se proporciona ID, registrar el uso
     if (flashcardId) {

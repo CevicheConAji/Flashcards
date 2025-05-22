@@ -10,9 +10,23 @@ window.API_BASE_URL = "/api";
  */
 
 // Evento principal que se ejecuta cuando el DOM está completamente cargado
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 DOM cargado - inicializando aplicación');
+
+    // Inicializar interfaz general
     inicializarInterfaz();
+
+    // Inicializar la página principal (incluye cargar las flashcards populares)
     inicializarPaginaPrincipal();
+
+    // Actualizar UI de autenticación
+    updateAuthUI();
+
+    // Configurar evento de logout
+    const logoutLink = document.getElementById('logout-link');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', logout);
+    }
 });
 
 /**
@@ -201,25 +215,45 @@ function showCategories() {
     document.getElementById("flashcards").style.display = "none";
     document.getElementById("categories").style.display = "block";
 }
-
-/**
- * FUNCIONES PARA FLASHCARDS POPULARES
- */
-
 /**
  * Carga las flashcards más usadas (llamada inicial)
  */
 function cargarFlashCardsMasUsadas() {
+    // Mostrar estado de carga
+    const container = document.getElementById("most-used-flashcards");
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    `;
+
+    console.log("📊 Realizando petición a:", `${API_BASE_URL}/flashcards/mas-usadas?limit=8`);
+
     fetch(`${API_BASE_URL}/flashcards/mas-usadas?limit=8`)
-        .then(response => response.json())
+        .then(response => {
+            console.log("📊 Respuesta recibida:", response.status);
+            if (!response.ok) {
+                throw new Error(`Error del servidor: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log("📊 Datos recibidos:", data);
             renderizarFlashCardsMasUsadas(data);
         })
         .catch(error => {
-            console.error("Error cargando flashcards más usadas:", error);
-            const container = document.getElementById("most-used-flashcards");
+            console.error("❌ Error cargando flashcards más usadas:", error);
             if (container) {
-                container.innerHTML = '<p class="text-danger">Error al cargar las flashcards más populares.</p>';
+                container.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i> 
+                        Error al cargar las flashcards más populares: ${error.message}
+                    </div>
+                `;
             }
         });
 }
@@ -267,7 +301,12 @@ function renderizarFlashCardsMasUsadas(flashcards) {
     container.innerHTML = "";
 
     if (!flashcards || flashcards.length === 0) {
-        container.innerHTML = '<p class="text-muted">No hay datos disponibles.</p>';
+        container.innerHTML = `
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle-fill"></i> 
+                No hay flashcards populares disponibles todavía.
+            </div>
+        `;
         return;
     }
 
@@ -288,6 +327,7 @@ function renderizarFlashCardsMasUsadas(flashcards) {
         img.src = `/images/${card.rutaImagen}`;
         img.className = "card-img-top img-fluid";
         img.alt = card.texto;
+        img.loading = "lazy"; // Mejora de rendimiento
 
         const body = document.createElement("div");
         body.className = "card-body";
@@ -299,6 +339,14 @@ function renderizarFlashCardsMasUsadas(flashcards) {
         const badge = document.createElement("span");
         badge.className = "badge bg-info";
         badge.textContent = `${card.contadorUso} usos`;
+
+        // Categoría (opcional)
+        if (card.categoriaNombre) {
+            const categoryBadge = document.createElement("span");
+            categoryBadge.className = "badge bg-secondary ms-1";
+            categoryBadge.textContent = card.categoriaNombre;
+            body.appendChild(categoryBadge);
+        }
 
         body.appendChild(title);
         body.appendChild(badge);
@@ -321,8 +369,14 @@ function renderizarFlashCardsMasUsadas(flashcards) {
  * @param {number} flashcardId - ID de la flashcard
  */
 function playAudio(audioFile, flashcardId) {
-    const audio = new Audio(`/audios/${audioFile}`);
-    audio.play();
+    console.log(`Reproduciendo audio: /audio/${audioFile}`);
+    const audio = new Audio(`/audio/${audioFile}`);
+
+    audio.play()
+        .catch(error => {
+            console.error("Error al reproducir audio:", error);
+            alert("No se pudo reproducir el audio. Intente hacer clic nuevamente.");
+        });
 
     // Si se proporciona ID, registrar el uso
     if (flashcardId) {
