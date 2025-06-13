@@ -54,7 +54,6 @@ public class DataLoader implements CommandLineRunner {
 
         // Verifica si las categorías ya existen antes de crearlas
         cargarCategoriaSiNoExiste(CATEGORIA_ACCIONES, this::crearCategoriaAcciones);
-        cargarCategoriaSiNoExiste(CATEGORIA_MIS_DATOS, this::crearCategoriaMisDatos);
         cargarCategoriaSiNoExiste(CATEGORIA_SENTIMIENTOS, this::crearCategoriaSentimientos);
         cargarCategoriaSiNoExiste(CATEGORIA_ANIMALES, this::crearCategoriaAnimales);
         cargarCategoriaSiNoExiste(CATEGORIA_COMIDA,this::crearCategoriaComida);
@@ -143,8 +142,7 @@ public class DataLoader implements CommandLineRunner {
     private Categoria crearCategoriaEmergenciaNecesidades(){
         List<String> nombresEmergencia = Arrays.asList(
                 "Ambulancia", "Ayuda", "Bombero", "Borracho", "Choque", "Ciego", "Discapacidad", "Doctor", "Dolor",
-                "Dolor de brazo", "Dolor de cabeza", "Dolor de estómago", "Dolor de espalda", "Dolor de garganta",
-                "Dolor de muela", "Dolor de oído", "Enfermera", "Escalera", "Fiebre", "Incendio", "Inyección",
+                "Enfermera", "Escalera", "Fiebre", "Incendio", "Inyección",
                 "Lastimar", "Pelea", "Policía", "Resfrío", "Robo", "Salida de emergencia", "Sordo"
         );
         return crearCategoriaConFlashCards(CATEGORIA_EMERGENCIA_NECESIDADES, nombresEmergencia);
@@ -156,11 +154,10 @@ public class DataLoader implements CommandLineRunner {
      */
     private Categoria crearCategoriaComida() {
         List<String> nombresComida = Arrays.asList(
-                "Agua", "Arroz", "Azúcar", "Banana", "Bebida", "Café", "Caramelo", "Carne", "Cebolla", "Cerveza",
+                "Agua", "Arroz", "Azúcar", "Banana", "Café", "Carne", "Cebolla", "Cerveza",
                 "Chocolate", "Chuches", "Ensalada", "Fideos", "Fruta", "Hamburguesa", "Helado", "Huevos", "Jamón",
-                "Lechuga", "Manzana", "Mayonesa", "Melocotón", "Mostaza", "Pan", "Papas Fritas", "Patata",
-                "Perrito Caliente", "Pescado", "Pizza", "Pollo", "Queso", "Sacarina", "Salchicha", "Sandía",
-                "Sándwich", "Té", "Tomate", "Torta", "Vino", "Zumo", "Zanahoria"
+                "Lechuga", "Manzana", "Pan", "Patatas Fritas", "Patata", "Pescado", "Pizza", "Pollo", "Queso",
+                "Salchicha", "Sándwich", "Té", "Tomate", "Vino", "Zumo", "Zanahoria"
         );
         return crearCategoriaConFlashCards(CATEGORIA_COMIDA, nombresComida);
     }
@@ -187,11 +184,11 @@ public class DataLoader implements CommandLineRunner {
      * @return Categoría "Acciones".
      */
     private Categoria crearCategoriaAcciones() {
-        List<String> nombresAcciones = Arrays.asList("Abrir", "Acostar" , "Agarrar" , "Almorzar" , "Aprender" , "Atar"
-                , "Bailar" , "Bajar" ,"Beber" , "Buscar" , "Caminar" , "Cantar" , "Cenar" , "Cerrar" ,"Comer" , "Cortar"
-                , "Correr" , "Desayunar" , "Despertar" , "Dibujar" , "Dormir" , "Empujar" , "Enseñar" , "Escuchar"
-                ,"Escribir" , "Estudiar" , "Guardar" , "Gritar" , "Hablar" , "Jugar" , "Leer" , "Llamar" , "Llorar"
-                , "Merendar" , "Mirar" , "Morder" , "Oler", "Pensar" , "Salir", "Servir" , "Sonreir" , "Subir" , "Tocar"
+        List<String> nombresAcciones = Arrays.asList("Abrir", "Acostar" , "Aprender"
+                , "Bajar" ,"Beber" , "Buscar" , "Caminar" , "Cerrar" ,"Comer" , "Cortar"
+                , "Correr" , "Despertar" , "Dibujar" , "Dormir" , "Empujar" , "Enseñar" , "Escuchar"
+                ,"Escribir" , "Estudiar" , "Guardar" , "Hablar" , "Jugar" , "Leer" , "Llamar" , "Llorar"
+                , "Mirar" , "Oler", "Pensar" , "Salir" , "Sonreir" , "Subir" , "Tocar"
                 , "Vestirse"
         );
         return crearCategoriaConFlashCards(CATEGORIA_ACCIONES, nombresAcciones);
@@ -222,17 +219,7 @@ public class DataLoader implements CommandLineRunner {
         );
         return crearCategoriaConFlashCards(CATEGORIA_SENTIMIENTOS, nombresSentimientos);
     }
-    /**
-     * Crea la categoría "Mis Datos" con sus flashcards.
-     *
-     * @return Categoría "Mis Datos".
-     */
-    private Categoria crearCategoriaMisDatos() {
-        return crearCategoriaConFlashCards(CATEGORIA_MIS_DATOS, Arrays.asList(
-                "Mi nombre es Juan",
-                "Mi edad es 30 años"
-        ));
-    }
+
 
     /**
      * Crea una categoría con una lista de nombres y genera flashcards para cada nombre.

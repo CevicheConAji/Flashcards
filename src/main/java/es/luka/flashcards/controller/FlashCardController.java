@@ -53,7 +53,12 @@ public class FlashCardController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-    // En FlashCardController.java - Añadir este nuevo endpoint
+    /**
+     * Obtiene las flashcards personalizadas de un usuario.
+     *
+     * @param username Nombre de usuario.
+     * @return Lista de flashcards personalizadas del usuario.
+     */
     @GetMapping("/flashcards/personalizadas/{username}")
     public ResponseEntity<List<FlashCard>> obtenerFlashCardsPersonalizadas(
             @PathVariable String username) {
